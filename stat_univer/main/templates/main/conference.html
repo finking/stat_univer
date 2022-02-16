@@ -1,0 +1,111 @@
+{% extends 'main/base.html'  %}
+
+{% block title %}
+    Конференции
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-center text-primary">Конференции.</h1>
+    <br>
+<div class="row g-5">
+
+      <div class="col-md-5 col-lg-4 order-md-last">
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-primary">История конференций:</span>
+
+        </h4>
+        <form class="card p-2" method="post" action="history">
+          {% csrf_token %}
+           <div class="input-group">
+                <p>Чтобы увидеть историю внесенных Вами конференций, введите email,
+                который вы указывали при их внесении: </p>
+                {{ form_history.as_p }}
+                <button type="submit" class="w-100 btn btn-primary">Показать внесенные конференции</button>
+            </div>
+        </form>
+      </div>
+      <div class="col-md-7 col-lg-8">
+        <span class="fw-bold"> {{ error }} </span>
+        <h4 class="mb-3 text-primary ">Внесение новой конференции</h4>
+        <p>Поля выделенные <b>жирным </b> являются обязательными.</p>
+        <form action="{% url 'conference' %}" method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-sm-12">
+              <label for="{{ form.Name.id_for_label }}" class="form-label fw-bold">{{ form.Name.label }}</label>
+              {{ form.Name }}
+            </div>
+
+            <div class="col-md-5">
+              <label for="{{form.Country.id_for_label}}" class="form-label fw-bold">{{ form.Country.label }}</label>
+              {{ form.Country }}
+            </div>
+
+            <div class="col-sm-12">
+              <label for="{{form.City.id_for_label}}" class="form-label fw-bold">{{ form.City.label }}</label>
+              {{ form.City }}
+            </div>
+
+            <div class="col-md-7">
+              <label for="{{form.Month.id_for_label}}" class="form-label fw-bold">{{ form.Month.label }}</label>
+              {{ form.Month }}
+            </div>
+
+            <div class="col-md-7">
+              <label for="{{form.Status.id_for_label}}" class="form-label fw-bold">{{form.Status.label}}</label>
+              {{ form.Status }}
+            </div>
+            <div class="col-md-7">
+              <label for="{{form.Total.id_for_label}}" class="form-label fw-bold">{{form.Total.label}}</label>
+              {{ form.Total }}
+            </div>
+            <div class="col-md-7">
+              <label for="{{form.Delegate.id_for_label}}" class="form-label fw-bold">{{form.Delegate.label}}</label>
+              {{ form.Delegate }}
+            </div>
+          </div>
+
+          <hr class="my-4">
+          <div class="col-sm-12">
+              {{ form.Organizer }}
+              <label for="{{form.Organizer.id_for_label}}" class="form-label fw-bold">{{form.Organizer.label}}  </label>
+              <div> {{ form.Organizer.help_text }}</div>
+          </div>
+
+          <hr class="my-4">
+          <div class="col-sm-12">
+              {{ form.Student }}
+              <label for="{{form.Student.id_for_label}}" class="form-label fw-bold">{{form.Student.label}}  </label>
+
+              <div> {{ form.Student.help_text }}</div>
+          </div>
+
+          <hr class="my-4">
+            <div class="col-12">
+              <label for="{{form.Url.id_for_label}}" class="form-label">{{form.Url.label}}<span class="text-muted"></span></label>
+              {{ form.Url }}
+              <div> {{ form.Url.help_text }}</div>
+            </div>
+            <br>
+            <div class="col-sm-12">
+              <label for="{{form.Email.id_for_label}}" class="form-label">{{form.Email.label}}<span class="text-muted"></span></label>
+              {{ form.Email }}
+              <div> {{ form.Email.help_text }}</div>
+            </div>
+            <br>
+            <div class="col-sm-12">
+              <label for="{{form.Comment.id_for_label}}" class="form-label">{{form.Comment.label}}
+                <span class="text-muted"> (Необязательно) </span>
+              </label>
+               {{ form.Comment }}
+            </div>
+          <hr class="my-4">
+          <button class="w-100 btn btn-primary btn-lg" type="submit">Отправить</button>
+        </form>
+      </div>
+    </div>
+    <br>
+<!--    <br>-->
+<!--    <br>-->
+<!--    <a href="{% url 'vvod' %}">Назад</a>-->
+{% endblock %}

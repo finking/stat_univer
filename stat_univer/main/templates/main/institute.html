@@ -1,0 +1,32 @@
+{% extends 'main/base.html'  %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+<h1 class="text-center"><u>Институты</u></h1>
+
+<div class="container">
+    {% if institutes %}
+        {% for el in institutes %}
+        <div class="row mt-4 mb-3">
+            <div class="col-8 offset-2 text-center border border-dark rounded">
+                <div class="h3"> {{ el.Name }} </div>
+            {% if el.IdDirector%}
+                <div> Директор: {{ el.IdDirector }} </div>
+             {% endif %}
+
+            {% if el.IdDeputeScience%}
+                <div class="mb-2"> Зам. директора по науке: {{ el.IdDeputeScience }} </div>
+            {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else%}
+        <div class="col-8 offset-2 text-center border border-dark rounded">Нет институтов в базе данных.</div>
+    {% endif %}
+</div>
+
+<!--<a href="{% url 'vvod' %}">Назад</a>-->
+{% endblock %}

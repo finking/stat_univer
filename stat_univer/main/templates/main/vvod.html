@@ -1,0 +1,19 @@
+{% extends 'main/base.html'  %}
+
+{% block title %}
+    Ввод данных
+{% endblock %}
+
+{% block content %}
+<div class="col-md-8 offset-md-3">
+    <h1>Ввод данных в базу данных</h1>
+    <div class="col-md-12">
+        <p>В данном подразделе указаны ссылки для добавления новой информации.</p>
+        <ul class="icon-list">
+          <li><a href="{% url 'conference' %} ">Добавить конференцию</a></li>
+          <li class="text-muted">Добавить статью (в разработке).</li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

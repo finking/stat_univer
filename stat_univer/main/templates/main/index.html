@@ -1,0 +1,41 @@
+{% extends 'main/base.html'  %}
+
+{% block title %}
+    Главная
+{% endblock %}
+
+{% block content %}
+
+<div class="col-md-8 offset-md-3">
+    <main>
+    <h1 class="text-center pb-3 pt-3">Добро пожаловать на сайт Отдела статистики УКНИ ГУУ.</h1>
+<!--        <hr class="col-3 col-md-2 mb-5">-->
+    <p class="fs-5 col-md-12 text-center pb-3 pt-3">Сайт создан для централизованного сбора и дальнейшей обработки массива данных поступающего
+    в отдел статистики.</p>
+
+    <hr class="col-3 col-md-2 mb-5">
+
+    <div class="row g-5 ">
+      <div class="col-md-6">
+        <h2>Просмотр</h2>
+        <p> В данном подразделе указаны ссылки для просмотра уже имеющейся информации.</p>
+        <ul class="icon-list">
+          <li><a href="{% url 'institute' %}" target="_blank">Институты</a></li>
+          <li><a href="{% url 'history' %}" target="_blank">Конференции</a></li>
+          <li class="text-muted">Статьи (в разработке).</li>
+        </ul>
+      </div>
+
+      <div class="col-md-6">
+        <h2>Добавление</h2>
+        <p>В данном подразделе указаны ссылки для добавления новой информации.</p>
+        <ul class="icon-list">
+          <li><a href="{% url 'conference' %} ">Добавить конференцию</a></li>
+          <li class="text-muted">Добавить статью (в разработке).</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+

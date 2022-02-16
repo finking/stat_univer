@@ -1,0 +1,52 @@
+{% extends 'main/base.html'  %}
+
+{% block title %}
+    История внесения Конференций
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-center text-primary">История внесения Конференций</h1>
+    <br>
+<div class="row g-5">
+
+      <div class="col-md-5 col-lg-4 order-md-last">
+
+        {% if conferences_history %}
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-primary">Найдено конференций: </span>
+          <span class="badge bg-primary rounded-pill"> {{ qty_history }}</span>
+        </h4>
+          <ul class="list-group mb-3">
+            {% for conference in conferences_history %}
+              <li class="list-group-item d-flex justify-content-between lh-sm">
+                <div>
+                  <h6 class="my-0">{{ conference.Name }} </h6>
+                  <small class="text-muted">{{ conference.City}}</small>
+                </div>
+<!--                <span class="text-muted">$12</span>-->
+              </li>
+              <br>
+            {% endfor %}
+          </ul>
+         {% elif message%}
+          <ul class="list-group mb-3">
+           <li class="list-group-item d-flex justify-content-between lh-sm">
+                <div>
+                  <h6 class="my-0"> {{ message }} </h6>
+                </div>
+           </li>
+          </ul>
+        {% endif %}
+<!--          <p>Чтобы увидеть историю внесенных Вами конференций, введите email,-->
+<!--                который вы указывали при их внесении:</p>-->
+<!--        <form class="card p-2" method="post">-->
+<!--          {% csrf_token %}-->
+<!--          <div class="input-group">-->
+<!--              {{ form.as_p }}-->
+<!--              <button type="submit" class="btn btn-secondary">Показать</button>-->
+<!--          </div>-->
+<!--        </form>-->
+      </div>
+    </div>
+    <a href="{% url 'conference' %}">Назад на страницу внесения конференций.</a>
+{% endblock %}
