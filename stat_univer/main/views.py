@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Institute, Conference
+from .models import Institute, Conference, Employee
 from .forms import ConferenceForm, InstituteForm, HistoryForm
 
 
@@ -12,11 +12,16 @@ def vvod(request):
 
 
 def institute(request):
+    dictInstitute = {}
     institutes = Institute.objects.order_by('-id')
+    if institutes:
+        for i in institutes:
+            NameInstitute = i.Name
+            Director = Employee.objects.filter(Name=i.IdDirector)
+            dictInstitute.setdefault(NameInstitute, Director)
+        print(dictInstitute)
     error = ''
-    print(111)
     if request.method == 'POST':
-        print(222)
         form = InstituteForm(request.POST)
         if form.is_valid():
             form.save()

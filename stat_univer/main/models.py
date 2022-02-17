@@ -100,8 +100,8 @@ class Employee(models.Model):
     )
 
     class Meta:
-        verbose_name = "Преподавателя"
-        verbose_name_plural = "Преподаватели"
+        verbose_name = "Сотрудника"
+        verbose_name_plural = "Сотрудники"
 
     def __str__(self):
         return self.Surname

@@ -11,7 +11,7 @@
     {% if institutes %}
         {% for el in institutes %}
         <div class="row mt-4 mb-3">
-            <div class="col-8 offset-2 text-center border border-dark rounded">
+            <div class="col-8 offset-2 text-center border border-primary rounded">
                 <div class="h3"> {{ el.Name }} </div>
             {% if el.IdDirector%}
                 <div> Директор: {{ el.IdDirector }} </div>
@@ -19,6 +19,8 @@
 
             {% if el.IdDeputeScience%}
                 <div class="mb-2"> Зам. директора по науке: {{ el.IdDeputeScience }} </div>
+            {% else %}
+                <div class="mb-2"> </div>
             {% endif %}
             </div>
         </div>
