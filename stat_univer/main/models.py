@@ -104,7 +104,7 @@ class Employee(models.Model):
         verbose_name_plural = "Сотрудники"
 
     def __str__(self):
-        return self.Surname
+        return f'{self.Surname} {self.Name} {self.MiddleName}'
 
 
 class Departure(models.Model):

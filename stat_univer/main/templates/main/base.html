@@ -12,17 +12,20 @@
     <link rel="shortcut icon" href="{% static 'main/images/guu.ico' %}" type="images/x-icon">
 </head>
 <body>
-    <div class="container">
+    <div class="container col-12">
         <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
           <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
             <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
-            <h5>Отдел статистики ГУУ</h5>
+            <h5 class="text-primary" >
+                <img src="{% static 'main/images/31-thumb_logo.jpg' %}" alt="" width="30" height="24" class="d-inline-block align-text-top">
+                    Отдел статистики ГУУ
+            </h5>
           </a>
 
           <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-            <li><a href="{% url 'index' %}" class="nav-link px-2 link-dark">Главная</a></li>
-            <li><a href="{% url 'vvod' %}" class="nav-link px-2 link-dark">Формы для заполнения</a></li>
-            <li><a href="#" class="nav-link px-2 link-dark">Частые вопросы</a></li>
+            <li><a href="{% url 'index' %}" class="nav-link px-2">Главная</a></li>
+            <li><a href="{% url 'vvod' %}" class="nav-link px-2">Формы для заполнения</a></li>
+            <li><a href="#" class="nav-link px-2">Частые вопросы</a></li>
           </ul>
 
           <div class="col-md-3 text-end">
