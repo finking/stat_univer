@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Institute, Conference, Employee
+from .models import Institute, Conference, Employee, FAQ
 from .forms import ConferenceForm, InstituteForm, HistoryForm
 
 
@@ -94,3 +94,8 @@ def history(request):
                'message': message,
                'form': form}
     return render(request, 'main/history.html', context)
+
+
+def faq(request):
+    faqs = FAQ.objects.order_by('id')
+    return render(request, 'main/faq.html', {'faqs': faqs})

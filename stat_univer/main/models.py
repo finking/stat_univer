@@ -170,3 +170,21 @@ class Conference(models.Model):
 
     def __str__(self):
         return self.Name
+
+
+class FAQ(models.Model):
+    Question = models.CharField('Вопрос', max_length=250)
+
+    Answer = models.TextField('Ответ')
+
+    Link = models.URLField('Ссылка на видео (при наличии)',
+                          help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
+                          blank=True,
+                          null=True)
+
+    class Meta:
+        verbose_name = "Вопрос"
+        verbose_name_plural = "Вопросы"
+
+    def __str__(self):
+        return self.Question

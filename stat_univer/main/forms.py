@@ -1,4 +1,4 @@
-from .models import Conference, Institute
+from .models import Conference, Institute, FAQ
 from django.forms import ModelForm, TextInput, Select, URLInput, EmailInput, Textarea, NumberInput, CheckboxInput, Form, EmailField
 
 
@@ -111,5 +111,30 @@ class InstituteForm(ModelForm):
             'IdDeputeScience': Select(attrs={
                 'class': 'form-select',
                 'id': 'IdDeputeScience',
+            }),
+        }
+
+
+class FAQForm(ModelForm):
+    class Meta:
+        model = FAQ
+        fields = ['Question', 'Answer', 'Link']
+
+        widgets = {
+            'Question': TextInput(attrs={
+                'class': 'form-control ',
+                'id': 'question',
+                'placeholder': 'Введите вопрос',
+            }),
+            'Answer': Textarea(attrs={
+                'class': 'form-control',
+                'id': 'answer',
+                'required': False
+            }),
+            'Link': URLInput(attrs={
+                'class': 'form-control',
+                'id': 'link',
+                'placeholder': 'https://',
+                'required': False
             }),
         }
