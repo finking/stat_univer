@@ -5,25 +5,13 @@
 {% endblock %}
 
 {% block content %}
+<div class="col-md-6 offset-md-3">
     <h1 class="text-center alert alert-primary">Конференции.</h1>
-    <br>
-<div class="row g-5">
 
-      <div class="col-md-5 col-lg-4 order-md-last">
-        <h4 class="d-flex justify-content-between align-items-center mb-3">
-          <span class="text-primary">История конференций:</span>
-
-        </h4>
-        <form class="card p-2" method="post" action="history">
-          {% csrf_token %}
-           <div class="input-group">
-                <p>Чтобы увидеть историю внесенных Вами конференций, введите email,
-                который вы указывали при их внесении: </p>
-                {{ form_history.as_p }}
-                <button type="submit" class="w-100 btn btn-primary">Показать внесенные конференции</button>
-            </div>
-        </form>
-      </div>
+    <div class="col-12">
+        <a href="{% url 'history' %}"> История внесения конференций.</a>
+    </div>
+  <hr>
       <div class="col-md-7 col-lg-8">
         <span class="fw-bold"> {{ error }} </span>
         <h4 class="mb-3 text-primary ">Внесение новой конференции</h4>

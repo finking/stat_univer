@@ -60,9 +60,7 @@ def conference(request):
     else:
         form = ConferenceForm()
 
-    form_history = HistoryForm()
     context = {'form': form,
-               'form_history': form_history,
                'error': error}
     return render(request, 'main/conference.html', context)
 
@@ -71,17 +69,21 @@ def history(request):
     message = ''
     conferences_history = None
     qty_history = 0
+    method = 1
     error = ''
     if request.method == 'POST':
         form = HistoryForm(request.POST)
+        method = 0
         if form.is_valid():
             email = form.cleaned_data['email']
             try:
                 conferences_history = Conference.objects.filter(Email=email)
                 qty_history = len(conferences_history)
+                if not qty_history:  # Если 0 конференций.
+                    message = f'Для указанного email ({email}) в базе данных конференций не обнаружено.'
             except Exception as e:
                 print(f"Ошибка: {e}")
-                message = 'Для указанного email в базе данных конференций не обнаружено.'
+
         else:
             # error = 'Произошла ошибка. Данные конференции не отправлены.'
             # print(form.cleaned_data)
@@ -92,6 +94,7 @@ def history(request):
     context = {'conferences_history': conferences_history,
                'qty_history': qty_history,
                'message': message,
+               'method': method,
                'form': form}
     return render(request, 'main/history.html', context)
 
