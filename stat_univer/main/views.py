@@ -11,6 +11,10 @@ def vvod(request):
     return render(request, 'main/vvod.html')
 
 
+def success(request):
+    return render(request, 'main/success.html')
+
+
 def institute(request):
     dictInstitute = {}
     institutes = Institute.objects.order_by('-id')
@@ -53,7 +57,7 @@ def conference(request):
         form = ConferenceForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('vvod')
+            return redirect('success')
         else:
             error = 'Произошла ошибка. Данные конференции не отправлены.'
             # print(form.cleaned_data)

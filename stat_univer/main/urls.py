@@ -9,5 +9,6 @@ urlpatterns = [
     path('lecturer', views.lecturer, name='lecturer'),
     path('conference', views.conference, name='conference'),
     path('history', views.history, name='history'),
-    path('faq', views.faq, name='faq')
+    path('faq', views.faq, name='faq'),
+    path('success', views.success, name='success')
 ]
