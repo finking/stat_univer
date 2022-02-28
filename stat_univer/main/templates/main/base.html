@@ -15,31 +15,36 @@
 <body>
     <div class="container col-12">
         <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-<!--          <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">-->
-<!--            <h5 class="text-primary" >-->
-<!--                <img src="{% static 'main/images/31-thumb_logo.jpg' %}" alt="" width="30" height="24" class="d-inline-block align-text-top">-->
-<!--                    Отдел статистики ГУУ-->
-<!--            </h5>-->
-<!--          </a>-->
-            <nav class="navbar navbar-light bg-light">
-              <div class="container-fluid">
-                <a class="navbar-brand text-primary" href="/">
-                  <img src="{% static 'main/images/31-thumb_logo.jpg' %}" alt="" width="30" height="24" class="d-inline-block align-text-top">
-                    Отдел статистики ГУУ
-                </a>
-              </div>
+            <nav class="col-12 navbar navbar-expand-lg navbar-light bg-light">
+                  <div class="container-fluid">
+                    <a class="navbar-brand text-primary" href="/">
+                          <img src="{% static 'main/images/31-thumb_logo.jpg' %}" alt="" width="30" height="24" class="d-inline-block align-text-top">
+                            Отдел статистики ГУУ
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Переключатель навигации">
+                      <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse mx-5" id="navbarSupportedContent">
+                      <ul class="navbar-nav me-auto px-5 mb-lg-0">
+                        <li class="nav-item">
+                          <a href="{% url 'index' %}" class="nav-link px-2">Главная</a>
+                        </li>
+                        <li class="nav-item">
+                          <li><a href="{% url 'vvod' %}" class="nav-link px-2">Формы для заполнения</a></li>
+                        </li>
+                          <li class="nav-item">
+                          <li><a href="{% url 'faq' %}" class="nav-link px-2">Частые вопросы</a></li>
+                        </li>
+                      </ul>
+                    <div class="col-4 text-end">
+                        <button type="button" class="btn btn-outline-primary me-2 disabled">Войти</button>
+<!--                        <button type="button" class="btn btn-primary disabled">Зарегистрироваться</button>-->
+                     </div>
+                    </div>
+                  </div>
             </nav>
 
-          <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-            <li><a href="{% url 'index' %}" class="nav-link px-2">Главная</a></li>
-            <li><a href="{% url 'vvod' %}" class="nav-link px-2">Формы для заполнения</a></li>
-            <li><a href="{% url 'faq' %}" class="nav-link px-2">Частые вопросы</a></li>
-          </ul>
 
-          <div class="col-md-3 text-end">
-            <button type="button" class="btn btn-outline-primary me-2 disabled">Войти</button>
-            <button type="button" class="btn btn-primary disabled">Зарегистрироваться</button>
-          </div>
         </header>
         {% block content %} {% endblock %}
     <footer class="d-flex flex-wrap align-items-center py-3 my-4 border-top">
