@@ -152,7 +152,18 @@ class Conference(models.Model):
                                 help_text='Введите примерное количество участников.')
     Delegate = models.IntegerField('В том числе от ГУУ:',
                                    help_text='Введите количество представителей ГУУ, участвующих в конференции.')
-    Url = models.URLField('Ссылка на конференцию',
+    # Общее количество студентов (для конференций, организованных вузом)
+    Total_student = models.IntegerField('Общее число студентов:',
+                                help_text='Введите количество студентов, принявших участие.',
+                                blank=True,
+                                null=True)
+    # Количество собственных студентов, принявших участие в конференции
+    Delegate_student = models.IntegerField('В том числе студентов из ГУУ:',
+                                   help_text='Введите количество студентов ГУУ, участвующих в конференции.',
+                                   blank=True,
+                                   null=True
+                                   )
+    Url = models.URLField('Ссылка на конференцию:',
                           help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
                           blank=True,
                           null=False)
@@ -160,7 +171,9 @@ class Conference(models.Model):
                               help_text='Укажите свой email. По данному email можно видеть все внесенные Вами конференции.',
                               blank=True,
                               null=True)
-    Comment = models.TextField('Комментарий:', blank=True, null=True)
+    Invite = models.TextField('Список организаций, в которые отправлены приглашения:',
+                              help_text='Введите организации (через запятую).',
+                              blank=True, null=True)
 
     TimeCreate = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
 

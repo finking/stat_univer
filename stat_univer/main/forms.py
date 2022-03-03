@@ -9,8 +9,8 @@ class ConferenceForm(ModelForm):
 
     class Meta:
         model = Conference
-        fields = ['Name', 'Country', 'City', 'Month', 'Organizer', 'Student', 'Status', 'Total',
-                  'Delegate', 'Url', 'Email', 'Comment']
+        fields = ['Name', 'Country', 'City', 'Month', 'Organizer', 'Student', 'Status', 'Total', 'Delegate',
+                  'Total_student', 'Delegate_student', 'Url', 'Email', 'Invite']
 
         widgets = {
             'Name': TextInput(attrs={
@@ -54,6 +54,18 @@ class ConferenceForm(ModelForm):
                 'id': 'Delegate',
                 'placeholder': 'Введите количество представителей ГУУ',
             }),
+            'Total_student': NumberInput(attrs={
+                'class': 'form-control',
+                'id': 'Total_student',
+                'placeholder': 'Введите количество студентов, принявших участие.',
+                'required': False
+            }),
+            'Delegate_student': NumberInput(attrs={
+                'class': 'form-control',
+                'id': 'Delegate_student',
+                'placeholder': 'Введите количество студентов ГУУ, участвующих в конференции.',
+                'required': False
+            }),
             'Url': URLInput(attrs={
                 'class': 'form-control',
                 'id': 'url',
@@ -66,9 +78,9 @@ class ConferenceForm(ModelForm):
                 'placeholder': 'you@example.com',
                 'required': False
             }),
-            'Comment': Textarea(attrs={
+            'Invite': Textarea(attrs={
                 'class': 'form-control',
-                'id': 'comment',
+                'id': 'Invite',
                 'required': False
             }),
 
