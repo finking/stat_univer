@@ -260,3 +260,11 @@ COUNTRY = (
     ('JM', 'Ямайка'),
     ('JP', 'Япония')
 )
+
+
+def dict_from_tuple(_tuple):
+    return dict((key, value) for key, value in _tuple)
+
+
+def binary(value):
+    return 'Да' if value else 'Нет'
