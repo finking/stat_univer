@@ -21,6 +21,7 @@ env = environ.Env(
 environ.Env.read_env()
 DEBUG = env('DEBUG')
 SECRET_KEY = env('SECRET_KEY')
+ERROR_LOG_FILENAME = 'log_error.log'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -134,3 +135,50 @@ STATICFILES_DIR = []
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'std_format': {
+            'format': '{asctime} [{name}] {levelname}: {module}:{funcName}:{lineno}: {message}',
+            'datefmt': '%d.%m.%Y %H:%M:%S',
+            'style': '{'
+        },
+        'console_format': {
+            'format': '{asctime} [{name}] {levelname}: {message}',
+            'datefmt': '%d.%m.%Y %H:%M:%S',
+            'style': '{'
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+            'formatter': 'console_format'
+        },
+        'logfile': {
+                    'formatter': 'std_format',
+                    'level': 'WARNING',
+                    'class': 'logging.handlers.RotatingFileHandler',
+                    'filename': ERROR_LOG_FILENAME,
+                },
+    },
+    'loggers': {
+        '': {
+            'level': 'DEBUG',
+            'handlers': ['console', 'logfile']
+        },
+        'django': {
+            'level': 'WARNING',
+            'handlers': ['console', 'logfile'],
+            'propagate': False
+        },
+        # 'django.request': {
+        #     'level': 'WARNING',
+        #     'handlers': ['logfile'],
+        #     'propagate': False
+        # }
+    },
+}
