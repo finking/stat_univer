@@ -36,8 +36,19 @@
                           <li><a href="{% url 'faq' %}" class="nav-link px-2">Частые вопросы</a></li>
                         </li>
                       </ul>
-                    <div class="col-4 text-end">
-                        <button type="button" class="btn btn-outline-primary me-2 disabled">Войти</button>
+                    <div class="text-end">
+                      <ul class="navbar-nav">
+                      {% if user.is_authenticated %}
+                          <li class="nav-item">
+                              <a href="{% url 'logout' %}" class="btn btn-outline-primary">Выйти</a>
+                          </li>
+                      {% else %}
+                        <li class="nav-item">
+                          <a href="{% url 'login' %}" class="btn btn-outline-primary">Войти</a>
+                        </li>
+                      {% endif %}
+                      </ul>
+<!--                        <button type="button" class="btn btn-outline-primary me-2 disabled">Войти</button>-->
 <!--                        <button type="button" class="btn btn-primary disabled">Зарегистрироваться</button>-->
                      </div>
                     </div>

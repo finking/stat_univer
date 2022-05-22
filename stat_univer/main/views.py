@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from .models import Institute, Conference, Employee, FAQ
 from .forms import ConferenceForm, HistoryForm
@@ -7,6 +8,7 @@ from xlsxwriter.workbook import Workbook
 import io
 import logging
 from .utils import dict_from_tuple, binary, MONTH, STATUS, COUNTRY
+from django.contrib.auth import authenticate, login, logout
 
 logger = logging.getLogger(__name__)
 
@@ -134,6 +136,37 @@ def export(request):
     output.close()
 
     return response
+
+
+def login_user(request):
+    logger.info('Загрузка страницы входа на сайт.')
+    if request.method == "POST":
+        logger.debug('Загрузка login.html')
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            logger.info(f'Вход на сайт пользователя {username}')
+            return redirect('profile')
+        else:
+            messages.success(request, 'Произошла ошибка при авторизации... Просьба попробовать еще раз.')
+            logger.warning(f"Неудачная попытка входа с логином: {username}")
+            return redirect('login')
+    else:
+        return render(request, 'authentication/login.html')
+
+
+def logout_user(request):
+    logger.info('Загрузка страницы выхода с сайта.')
+    logout(request)
+    messages.success(request, 'Вы вышли из системы. Чтобы заново войти, заполните форму ниже.')
+    return redirect('login')
+
+
+def profile(request):
+    logger.info('Загрузка страницы профиля.')
+    return render(request, 'main/profile.html', {'title': "Профиль сотрудника"})
 
 
 def write_to_excel(conferences_queryset):
