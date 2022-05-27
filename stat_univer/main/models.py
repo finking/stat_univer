@@ -201,3 +201,83 @@ class FAQ(models.Model):
 
     def __str__(self):
         return self.Question
+
+
+class Publication(models.Model):
+    class Meta:
+        abstract = True
+    
+    Name = models.CharField('Название публикации', max_length=250)
+    Output = models.CharField('Полное название конференции', max_length=250)
+    Year = models.IntegerField('Год',
+                               blank=True,
+                               null=True)
+    Pages = models.CharField('Страницы', max_length=50,
+                                blank=True,
+                                null=True)
+    DepartmentSame = models.CharField('Авторы ГУУ с отчетной кафедры', max_length=250)
+    DepartmentOther = models.CharField('Авторы с других кафедр ГУУ', max_length=250)
+
+    Url = models.URLField('Ссылка на Ринц или сборник конференции',
+                          help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
+                          blank=True,
+                          null=True)
+    
+    Accepted = models.BooleanField('Принято', default=False)
+    Points = models.FloatField('Количество баллов',
+                               blank=True,
+                               null=True)
+    Comment = models.TextField('Комментарий УКНИ',
+                               blank=True,
+                               null=True)
+    
+    IdInstitute = models.ForeignKey(
+        'Institute',
+        verbose_name='Институт',
+        on_delete=models.PROTECT, null=True, help_text='Выберите название института.'
+    )
+
+    IdDeparture = models.ForeignKey(
+        'Departure',
+        verbose_name='Кафедра',
+        on_delete=models.PROTECT,
+        help_text='Выберите название кафедры.'
+    )
+
+
+class VAK(Publication):
+    class Meta:
+        verbose_name = "Публикация ВАК"
+        verbose_name_plural = "Публикации ВАК"
+        
+    def __str__(self):
+        return self.Name
+    
+    Tom = models.CharField('Том',
+                           max_length=250,
+                           blank=True,
+                           null=True)
+    Output = models.CharField('Название журнала', max_length=250)
+    Url = models.URLField('Ссылка на Ринц или публикацию в журнале',
+                          help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
+                          blank=True,
+                          null=True)
+
+
+class ThesisWorld(Publication):
+    Type = models.CharField('Тезисы на международных конференциях', max_length=250)
+
+
+class ThesisNation(Publication):
+    Type = models.CharField('Тезисы на национальных конференциях', max_length=250)
+    
+    
+class Monograph(Publication):
+    Output = models.CharField('ISBN',
+                              max_length=100,
+                              blank=True,
+                              null=True)
+    Url = models.URLField('Ссылка на Ринц или на файл pdf, загруженный на стороннем ресурсе',
+                          help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
+                          blank=True,
+                          null=True)

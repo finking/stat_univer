@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from .models import Institute, Conference, Employee, FAQ
-from .forms import ConferenceForm, HistoryForm
+from .forms import ConferenceForm, HistoryForm, VAKForm
 from django.http import HttpResponse
 from datetime import datetime
 from xlsxwriter.workbook import Workbook
@@ -39,7 +39,7 @@ def institute(request):
             dictInstitute.setdefault(NameInstitute, Director)
         logger.debug(dictInstitute)
     error = ''
-
+    
     return render(request, 'main/institute.html', {'title': 'Институты ГУУ',
                                                    'institutes': institutes,
                                                    # 'form': form,
@@ -69,7 +69,7 @@ def conference(request):
             logger.error(form.cleaned_data)
     else:
         form = ConferenceForm()
-
+    
     context = {'form': form,
                'error': error}
     logger.debug(context)
@@ -82,7 +82,7 @@ def history(request):
     conferences_history = None
     qty_history = 0
     method = 1
-
+    
     if request.method == 'POST':
         form = HistoryForm(request.POST)
         method = 0
@@ -96,19 +96,19 @@ def history(request):
                     logger.info(message)
             except Exception as e:
                 logger.error(f"Ошибка: {e}")
-
+        
         else:
             logger.debug(f'Произошла ошибка. Данные конференции не отправлены. Данные формы: {form.cleaned_data}')
     else:
         form = HistoryForm()
-
+    
     context = {'conferences_history': conferences_history,
                'qty_history': qty_history,
                'message': message,
                'method': method,
                'form': form}
     logger.debug(context)
-
+    
     return render(request, 'main/history.html', context)
 
 
@@ -126,15 +126,15 @@ def export(request):
         logger.debug(f'Кол-во загружаемых конференций: {len(conferences_queryset)}')
     except Exception as e:
         logger.exception(f'Загрузка конференций не удалась. Ошибка: {e}')
-
+    
     output = write_to_excel(conferences_queryset)
-
+    
     response = HttpResponse(output.read(),
                             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     response['Content-Disposition'] = f"attachment; filename={datetime.now().strftime('%d-%m-%Y')}-conferences.xlsx"
-
+    
     output.close()
-
+    
     return response
 
 
@@ -166,7 +166,32 @@ def logout_user(request):
 
 def profile(request):
     logger.info('Загрузка страницы профиля.')
-    return render(request, 'main/profile.html', {'title': "Профиль сотрудника"})
+    
+    context = {'title': "Профиль сотрудника"}
+
+    return render(request, 'authentication/profile.html', context)
+
+
+def vak(request):
+    logger.info('Загрузка страницы добавления ВАК.')
+    error = ''
+    if request.method == 'POST':
+        form = VAKForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Публикация добавлена!')
+            return redirect('profile')
+        else:
+            error = 'Произошла ошибка. Данные публикации не отправлены.'
+            logger.error(form.cleaned_data)
+    else:
+        form = VAKForm()
+    
+    context = {'title': "Добавление статьи ВАК",
+               'form': form,
+               'error': error}
+    logger.debug(context)
+    return render(request, 'authentication/vak.html', context)
 
 
 def write_to_excel(conferences_queryset):
@@ -216,17 +241,17 @@ def write_to_excel(conferences_queryset):
     if conferences_queryset:
         for conference in conferences_queryset:
             row_num += 1
-
+            
             # Поиск необходимых значеий в соответствующих словарях
             month = dict_month[conference.Month]
             country = dict_country[conference.Country]
             status = dict_status[conference.Status]
             student = binary(conference.Student)  # Студенческая или нет
             organizer = binary(conference.Organizer)  # Организатор ГУУ или нет
-
+            
             timeCreate = conference.TimeCreate.strftime(
                 "%d-%m-%Y %H:%M:%S")  # Преобразование времени в строковый формат
-
+            
             # Определение значений для каждой строки
             row = [
                 conference.Name,
@@ -245,7 +270,7 @@ def write_to_excel(conferences_queryset):
                 conference.Invite,
                 timeCreate,
             ]
-
+            
             # Присвоение значений для каждой ячейки в строке
             for col_num, cell_value in enumerate(row, 0):
                 worksheet.write(row_num, col_num, cell_value)
