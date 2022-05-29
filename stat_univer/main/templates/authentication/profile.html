@@ -1,11 +1,13 @@
-{% extends 'authentication/auth_base.html'  %}
+{% extends 'main/base.html'  %}
 
 {% block title %}
     {{ title }}
 {% endblock %}
 
-{% block authcontent %}
-
+{% block content %}
+<div class="row">
+{% include 'authentication/menu.html' %}
+<div class="col-md-6">
     <h1 class="text-center alert alert-primary">{{ title }}</h1>
     {% if messages %}
         {% for message in messages%}
@@ -20,5 +22,6 @@
      <p>Здесь какую общую информацию надо разместить</p>
 
     </div>
-
+</div>
+</div>
 {% endblock %}

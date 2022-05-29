@@ -1,11 +1,4 @@
-{% extends 'main/base.html'  %}
 
-{% block title %}
-    {{ title }}
-{% endblock %}
-
-{% block content %}
-<div class="row">
     <div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 280px; height: 510px">
         <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
           <span class="fs-4">МЕНЮ</span>
@@ -32,28 +25,3 @@
           </li>
         </ul>
     </div>
-    <div class="col-md-6">
-        {% block auth_content %}
-        <h1 class="text-center alert alert-primary">{{ title }}</h1>
-        {% if messages %}
-            {% for message in messages%}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor%}
-        {% endif%}
-
-        <div class="col-12">
-        <h4 class="mb-3 text-primary ">Внесение данных по публикациям.</h4>
-          <br>
-        <a href="{% url 'vak' %}"> Добавить статью ВАК</a>
-
-        </div>
-        {% endblock %}
-    </div>
-
-</div>
-
-
-{% endblock %}

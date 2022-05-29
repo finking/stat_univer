@@ -5,7 +5,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="col-md-6 offset-md-3">
+<div class="row">
+{% include 'authentication/menu.html' %}
+<div class="col-md-6">
     <h1 class="text-center alert alert-primary">{{ title }}</h1>
     {% if messages%}
         {% for message in messages%}
@@ -23,10 +25,17 @@
           {% csrf_token %}
           <div class="row g-3">
             {% for f in form %}
-            <div class="col-sm-12">
-              <label for="{{ f.id_for_label }}" class="form-label fw-bold">{{ f.label }}</label>
-              {{ f }}
-            </div>
+                {% if f.field.required %}
+                    <div class="col-sm-12">
+                    <label for="{{ f.id_for_label }}" class="form-label fw-bold">{{ f.label }}</label>
+                    {{ f }}
+                </div>
+                {% else %}
+                    <div class="col-sm-12">
+                    <label for="{{ f.id_for_label }}" class="form-label">{{ f.label }}</label>
+                    {{ f }}
+                </div>
+                {% endif %}
             {% endfor %}
           </div>
           <hr class="my-4">
@@ -34,5 +43,5 @@
         </form>
       </div>
     </div>
-
+</div>
 {% endblock %}

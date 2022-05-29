@@ -35,6 +35,11 @@
                           <li class="nav-item">
                           <li><a href="{% url 'faq' %}" class="nav-link px-2">Частые вопросы</a></li>
                         </li>
+                        {% if user.is_authenticated %}
+                        <li class="nav-item">
+                          <li><a href="{% url 'profile' %}" class="nav-link px-2">Профиль</a></li>
+                        </li>
+                        {% endif %}
                       </ul>
                     <div class="text-end">
                       <ul class="navbar-nav">

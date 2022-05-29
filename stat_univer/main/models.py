@@ -215,8 +215,14 @@ class Publication(models.Model):
     Pages = models.CharField('Страницы', max_length=50,
                                 blank=True,
                                 null=True)
-    DepartmentSame = models.CharField('Авторы ГУУ с отчетной кафедры', max_length=250)
-    DepartmentOther = models.CharField('Авторы с других кафедр ГУУ', max_length=250)
+    DepartmentSame = models.CharField('Авторы ГУУ с отчетной кафедры',
+                                      max_length=250,
+                                      blank=True,
+                                      null=True)
+    DepartmentOther = models.CharField('Авторы с других кафедр ГУУ',
+                                       max_length=250,
+                                       blank=True,
+                                       null=True)
 
     Url = models.URLField('Ссылка на Ринц или сборник конференции',
                           help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
