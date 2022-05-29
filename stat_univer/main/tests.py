@@ -50,6 +50,22 @@ class TestUrls(TestCase):
         url = reverse('export')
         self.assertEquals(resolve(url).func, export)
 
+    def test_url_login_user(self):
+        url = reverse('login')
+        self.assertEquals(resolve(url).func, login_user)
+
+    def test_url_logout_user(self):
+        url = reverse('logout')
+        self.assertEquals(resolve(url).func, logout_user)
+
+    def test_url_profile(self):
+        url = reverse('profile')
+        self.assertEquals(resolve(url).func, profile)
+
+    def test_url_vak(self):
+        url = reverse('vak')
+        self.assertEquals(resolve(url).func, vak)
+
 # ******* Начало проверки Views *********
 class TestViewConference(TestCase):
     def setUp(self):
