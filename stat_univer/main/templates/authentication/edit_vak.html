@@ -19,7 +19,7 @@
     {% endif%}
 
       <div class="col-12">
-        <h4 class="mb-3 text-primary ">Внесение Публикации ВАК</h4>
+        <h4 class="mb-3 text-primary ">{{ title }}</h4>
         <p>Поля выделенные <b>жирным </b> являются обязательными.</p>
         <form action="{% url 'vak' %}" method="post">
           {% csrf_token %}

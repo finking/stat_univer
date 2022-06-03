@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from .models import Institute, Conference, Employee, FAQ
+from .models import Institute, Conference, Employee, FAQ, VAK
 from .forms import ConferenceForm, HistoryForm, VAKForm
 from django.http import HttpResponse
 from datetime import datetime
@@ -193,6 +193,44 @@ def vak(request):
     logger.debug(context)
     return render(request, 'authentication/vak.html', context)
 
+
+def edit_vak(request):
+    logger.info('Загрузка страницы редактирования ВАК.')
+    error = ''
+
+    if request.method == 'POST':
+        form = VAKForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Публикация отредактирована!')
+            return redirect('profile')
+        else:
+            error = 'Произошла ошибка. Данные публикации не отправлены.'
+            logger.error(form.cleaned_data)
+    else:
+        # Словарь для заполнения формы
+        vak_initial = {}
+        try:
+            vak_queryset = VAK.objects.get(id=1) # Получение данных из базы данных
+            logger.debug(f'Загрузка публикации ВАК: {vak_queryset}')
+            for key, value in vak_queryset.__dict__.items():
+                if value:
+                    vak_initial[key] = value
+                    if key == 'IdInstitute_id':
+                        vak_initial['IdInstitute'] = value
+                    elif key == 'IdDeparture_id':
+                        vak_initial['IdDeparture'] = value
+            logger.debug(f'Начальные данные: {vak_initial}')
+
+        except Exception as e:
+            logger.exception(f'Загрузка конференций не удалась. Ошибка: {e}')
+        form = VAKForm(initial=vak_initial)
+    
+    context = {'title': "Редактирование статьи ВАК",
+               'form': form,
+               'error': error}
+    logger.debug(context)
+    return render(request, 'authentication/edit_vak.html', context)
 
 def write_to_excel(conferences_queryset):
     # Определение заголовков.
