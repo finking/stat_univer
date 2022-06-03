@@ -1,0 +1,52 @@
+{% extends 'main/base.html'  %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+{% include 'authentication/menu.html' %}
+<div class="col-md-8">
+    <h1 class="text-center alert alert-primary">{{ title }}</h1>
+    {% if messages %}
+        {% for message in messages%}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor%}
+    {% endif%}
+
+    <div class="col-12">
+        <table class="table">
+              <thead>
+                <tr class="bw">
+                  <th scope="col">Институт</th>
+                  <th scope="col">Кафедра</th>
+                  <th scope="col">План</th>
+                  <th scope="col">Факт</th>
+                </tr>
+                </thead>
+             <tbody>
+            {% for k,v in institutes.items %}
+            <tr class="table-primary">
+                <td colspan="2">{{ k }}</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            {% for d in v %}
+                <tr class="table-light">
+               <td></td>
+                <td>{{ d }}</td>
+                <td>0</td>
+                <td>0</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+             </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

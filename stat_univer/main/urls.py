@@ -17,4 +17,5 @@ urlpatterns = [
     path('profile', views.profile, name='profile'),
     path('vak', views.vak, name='vak'),
     path('edit_vak', views.edit_vak, name='edit_vak'),
+    path('main', views.main, name='main'),
 ]

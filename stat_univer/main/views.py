@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from .models import Institute, Conference, Employee, FAQ, VAK
+from .models import Institute, Conference, Employee, FAQ, VAK, Departure
 from .forms import ConferenceForm, HistoryForm, VAKForm
 from django.http import HttpResponse
 from datetime import datetime
@@ -231,6 +231,26 @@ def edit_vak(request):
                'error': error}
     logger.debug(context)
     return render(request, 'authentication/edit_vak.html', context)
+
+
+# Обработка отображения страницы план-факта
+def main(request):
+    dict_institute = {}
+    institutes = Institute.objects.all()
+    for institute in institutes:
+        departures = institute.departure_set.all()  # Получение всех кафедр института
+        for departure in departures:
+            logger.debug(f'Ключи: {dict_institute.keys()}')
+            if institute.Name not in dict_institute.keys():
+                dict_institute[institute.Name] = []
+            dict_institute[institute.Name].append(departure.Name)
+    logger.debug(dict_institute)
+    
+    context = {'title': "Список Институтов и кафедр",
+               'institutes': dict_institute}
+    logger.debug(context)
+    return render(request, 'authentication/main.html', context)
+
 
 def write_to_excel(conferences_queryset):
     # Определение заголовков.
