@@ -22,27 +22,29 @@
         <table class="table">
               <thead>
                 <tr class="bw">
-                  <th scope="col">Институт</th>
-                  <th scope="col">Кафедра</th>
+                  <th scope="col">Институт/Кафедра</th>
+                  <th scope="col">Показатель</th>
                   <th scope="col">План</th>
                   <th scope="col">Факт</th>
                 </tr>
                 </thead>
              <tbody>
-            {% for k,v in institutes.items %}
-            <tr class="table-primary">
-                <td colspan="2">{{ k }}</td>
-                <td>0</td>
-                <td>0</td>
-            </tr>
-            {% for d in v %}
-                <tr class="table-light">
-               <td></td>
-                <td>{{ d }}</td>
-                <td>0</td>
-                <td>0</td>
+            {% for institute in institutes %}
+                <tr class="table-primary">
+                    <td colspan="2">{{ institute }}</td>
+                    <td>0</td>
+                    <td>0</td>
                 </tr>
-            {% endfor %}
+                {% for vak in vaks %}
+                    {% if vak.IdInstitute__Name == institute %}
+                        <tr class="table-light">
+                        <td style="padding-left: 25px;"> {{ vak.IdDeparture__Name }} </td>
+                        <td>Публикации ВАК </td>
+                        <td>0</td>
+                        <td>{{ vak.id__count}}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
             {% endfor %}
              </tbody>
         </table>

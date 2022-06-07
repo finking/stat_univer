@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db.models import Count
 from django.shortcuts import render, redirect
 from .models import Institute, Conference, Employee, FAQ, VAK, Departure
 from .forms import ConferenceForm, HistoryForm, VAKForm
@@ -235,23 +236,21 @@ def edit_vak(request):
 
 # Обработка отображения страницы план-факта
 def main(request):
-    dict_institute = {}
+    list_institute = []
+    vaks = VAK.objects.values('IdDeparture__Name', 'IdInstitute__Name').annotate(Count('id'))
+    logger.debug(f'Vaks: {vaks}')
     institutes = Institute.objects.all()
     for institute in institutes:
-        departures = institute.departure_set.all()  # Получение всех кафедр института
-        for departure in departures:
-            logger.debug(f'Ключи: {dict_institute.keys()}')
-            if institute.Name not in dict_institute.keys():
-                dict_institute[institute.Name] = []
-            dict_institute[institute.Name].append(departure.Name)
-    logger.debug(dict_institute)
-    
-    context = {'title': "Список Институтов и кафедр",
-               'institutes': dict_institute}
+        list_institute.append(institute.Name)
+    logger.debug(list_institute)
+   
+    context = {'title': "План-факт по науке",
+               'institutes': list_institute,
+               'vaks': vaks}
     logger.debug(context)
     return render(request, 'authentication/main.html', context)
 
-
+    
 def write_to_excel(conferences_queryset):
     # Определение заголовков.
     header_columns = [
