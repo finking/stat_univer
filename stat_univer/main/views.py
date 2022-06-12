@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.db.models import Count
 from django.shortcuts import render, redirect
 from .models import Institute, Conference, Employee, FAQ, VAK, Departure
-from .forms import ConferenceForm, HistoryForm, VAKForm
+from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm
 from django.http import HttpResponse
 from datetime import datetime
 from xlsxwriter.workbook import Workbook
@@ -193,6 +193,27 @@ def vak(request):
                'error': error}
     logger.debug(context)
     return render(request, 'authentication/vak.html', context)
+
+
+def thesis(request):
+    logger.info('Загрузка страницы добавления тезисов международных конференций.')
+    error = ''
+    if request.method == 'POST':
+        form = ThesisForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Публикация добавлена!')
+            return redirect('profile')
+        else:
+            error = 'Произошла ошибка. Данные публикации не отправлены.'
+            logger.error(form.cleaned_data)
+    else:
+        form = ThesisForm()
+
+    context = {'title': "Добавление тезисов конференции",
+               'form': form}
+    logger.debug(context)
+    return render(request, 'authentication/thesis.html', context)
 
 
 def edit_vak(request):

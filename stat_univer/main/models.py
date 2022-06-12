@@ -270,12 +270,17 @@ class VAK(Publication):
                           null=True)
 
 
-class ThesisWorld(Publication):
-    Type = models.CharField('Тезисы на международных конференциях', max_length=250)
+class Thesis(Publication):
+    class Meta:
+        verbose_name = "Тезис"
+        verbose_name_plural = "Тезисы"
 
+    def __str__(self):
+        return self.Name
 
-class ThesisNation(Publication):
-    Type = models.CharField('Тезисы на национальных конференциях', max_length=250)
+    Type = models.CharField('Тип конференции',
+                              choices=TYPECONFERENCE,
+                              max_length=2)
     
     
 class Monograph(Publication):

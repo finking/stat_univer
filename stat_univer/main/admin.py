@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Institute, Departure, Employee, Conference, FAQ, VAK
+from .models import Institute, Departure, Employee, Conference, FAQ, VAK, Thesis
 
 
 class InstituteAdmin(admin.ModelAdmin):
@@ -19,6 +19,7 @@ admin.site.register(Employee)
 admin.site.register(Conference)
 admin.site.register(FAQ)
 admin.site.register(VAK)
+admin.site.register(Thesis)
 
 admin.site.site_title = 'Админ-панель сайта отдела статистики ГУУ'
 admin.site.site_header = 'Админ-панель сайта отдела статистики ГУУ'
