@@ -234,23 +234,29 @@ def edit_vak(request):
     return render(request, 'authentication/edit_vak.html', context)
 
 
-# Обработка отображения страницы план-факта
+# Отчет по институтам
 def main(request):
-    list_institute = []
-    vaks = VAK.objects.values('IdDeparture__Name', 'IdInstitute__Name').annotate(Count('id'))
-    logger.debug(f'Vaks: {vaks}')
     institutes = Institute.objects.all()
-    for institute in institutes:
-        list_institute.append(institute.Name)
-    logger.debug(list_institute)
-   
+    vaks = VAK.objects.values('IdInstitute__Name').annotate(Count('id'))
+    logger.debug(f'Vaks: {vaks}')
     context = {'title': "План-факт по науке",
-               'institutes': list_institute,
+               'institutes': institutes,
                'vaks': vaks}
     logger.debug(context)
     return render(request, 'authentication/main.html', context)
 
-    
+
+# Отчет по кафедрам для каждого института
+def report(request, institute_id):
+    institute = Institute.objects.get(id=institute_id)
+    vaks = VAK.objects.filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
+
+    context = {'title': f"План-факт по науке в {institute.ShortName}",
+               'vaks': vaks
+               }
+    return render(request, 'authentication/report.html', context)
+
+
 def write_to_excel(conferences_queryset):
     # Определение заголовков.
     header_columns = [

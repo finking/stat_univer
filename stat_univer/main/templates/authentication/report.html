@@ -22,32 +22,29 @@
         <table class="table">
               <thead>
                 <tr class="bw">
-                  <th scope="col">Институт/Показатель</th>
+                  <th scope="col">Кафедра/Показатель</th>
                   <th scope="col">План</th>
                   <th scope="col">Факт</th>
                   <th scope="col">% выпол.</th>
                 </tr>
                 </thead>
              <tbody>
-            {% for institute in institutes %}
+             {% for vak in vaks %}
                 <tr class="table-primary">
-                    <td colspan="4">
-                        <a href="{% url 'report' institute_id=institute.id %}"> {{ institute}} </a>
-                    </td>
+                    <td colspan="4"> {{ vak.IdDeparture__Name }}</td>
+
                 </tr>
-                {% for vak in vaks %}
-                    {% if vak.IdInstitute__Name == institute.Name %}
-                        <tr class="table-light">
-                        <td style="padding-left: 25px;"> Количество публикаций в журналах ВАК </td>
-                        <td>0</td>
-                        <td>{{ vak.id__count}}</td>
-                        <td>0</td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
+
+                <tr class="table-light">
+                    <td style="padding-left: 25px;"> Количество публикаций в журналах ВАК </td>
+                    <td> 0 </td>
+                    <td>{{ vak.id__count}}</td>
+                    <td> 0 </td>
+                </tr>
             {% endfor %}
              </tbody>
         </table>
+        <a href="{% url 'main' %}"> Назад к просмотру План-факт </a>
     </div>
 </div>
 </div>
