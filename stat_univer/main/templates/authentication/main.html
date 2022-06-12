@@ -45,6 +45,26 @@
                         </tr>
                     {% endif %}
                 {% endfor %}
+                {% for tw in thesisWorld %}
+                    {% if tw.IdInstitute__Name == institute.Name %}
+                        <tr class="table-light">
+                        <td style="padding-left: 25px;"> Количество тезисов в международных конференциях </td>
+                        <td>0</td>
+                        <td>{{ tw.id__count}}</td>
+                        <td>0</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                {% for tn in thesisNation %}
+                    {% if tn.IdInstitute__Name == institute.Name %}
+                        <tr class="table-light">
+                        <td style="padding-left: 25px;"> Количество тезисов в национальных конференциях </td>
+                        <td>0</td>
+                        <td>{{ tn.id__count}}</td>
+                        <td>0</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
             {% endfor %}
              </tbody>
         </table>

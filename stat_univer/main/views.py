@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.db.models import Count
 from django.shortcuts import render, redirect
-from .models import Institute, Conference, Employee, FAQ, VAK, Departure
+from .models import Institute, Conference, Employee, FAQ, VAK, Thesis
 from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm
 from django.http import HttpResponse
 from datetime import datetime
@@ -259,10 +259,14 @@ def edit_vak(request):
 def main(request):
     institutes = Institute.objects.all()
     vaks = VAK.objects.values('IdInstitute__Name').annotate(Count('id'))
-    logger.debug(f'Vaks: {vaks}')
+    thesisWorld = Thesis.objects.filter(Type='M').values('IdInstitute__Name').annotate(Count('id'))
+    thesisNation = Thesis.objects.filter(Type='N').values('IdInstitute__Name').annotate(Count('id'))
+    logger.debug(f'Vaks: {vaks}, тезисы в междун. конф: {thesisWorld}, тезисы в нац.конф: {thesisNation}')
     context = {'title': "План-факт по науке",
                'institutes': institutes,
-               'vaks': vaks}
+               'vaks': vaks,
+               'thesisWorld': thesisWorld,
+               'thesisNation': thesisNation}
     logger.debug(context)
     return render(request, 'authentication/main.html', context)
 
@@ -271,9 +275,13 @@ def main(request):
 def report(request, institute_id):
     institute = Institute.objects.get(id=institute_id)
     vaks = VAK.objects.filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
+    thesisWorld = Thesis.objects.filter(Type='M').filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
+    thesisNation = Thesis.objects.filter(Type='N').filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
 
     context = {'title': f"План-факт по науке в {institute.ShortName}",
-               'vaks': vaks
+               'vaks': vaks,
+               'thesisWorld': thesisWorld,
+               'thesisNation': thesisNation
                }
     return render(request, 'authentication/report.html', context)
 

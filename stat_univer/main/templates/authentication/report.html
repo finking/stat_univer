@@ -32,13 +32,33 @@
              {% for vak in vaks %}
                 <tr class="table-primary">
                     <td colspan="4"> {{ vak.IdDeparture__Name }}</td>
-
                 </tr>
-
                 <tr class="table-light">
                     <td style="padding-left: 25px;"> Количество публикаций в журналах ВАК </td>
                     <td> 0 </td>
                     <td>{{ vak.id__count}}</td>
+                    <td> 0 </td>
+                </tr>
+            {% endfor %}
+            {% for tw in thesisWorld %}
+                <tr class="table-primary">
+                    <td colspan="4"> {{tw.IdDeparture__Name }}</td>
+                </tr>
+                <tr class="table-light">
+                    <td style="padding-left: 25px;"> Количество тезисов в международных конференциях </td>
+                    <td> 0 </td>
+                    <td>{{ tw.id__count}}</td>
+                    <td> 0 </td>
+                </tr>
+            {% endfor %}
+             {% for tn in thesisNation %}
+                <tr class="table-primary">
+                    <td colspan="4"> {{ tn.IdDeparture__Name }}</td>
+                </tr>
+                <tr class="table-light">
+                    <td style="padding-left: 25px;"> Количество тезисов в национальных конференциях </td>
+                    <td> 0 </td>
+                    <td>{{ tn.id__count}}</td>
                     <td> 0 </td>
                 </tr>
             {% endfor %}
