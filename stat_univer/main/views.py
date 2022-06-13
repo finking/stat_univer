@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.db.models import Count
 from django.shortcuts import render, redirect
-from .models import Institute, Conference, Employee, FAQ, VAK, Thesis
+from .models import Institute, Conference, Employee, FAQ, VAK, Thesis, Departure
 from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm
 from django.http import HttpResponse
 from datetime import datetime
@@ -273,15 +273,37 @@ def main(request):
 
 # Отчет по кафедрам для каждого института
 def report(request, institute_id):
+
+    # Получение данных из соответствующих таблиц
     institute = Institute.objects.get(id=institute_id)
+    departures = Departure.objects.filter(IdInstitute=institute_id).values('id', 'Name')
     vaks = VAK.objects.filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
     thesisWorld = Thesis.objects.filter(Type='M').filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
     thesisNation = Thesis.objects.filter(Type='N').filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
 
+    # Преобразование QuerySet в List
+    list_thesisNation = list(thesisNation)
+    list_departures = list(departures)
+    list_vaks = list(vaks)
+    list_thesisWorld = list(thesisWorld)
+
+    # Добавление в список кафедр, необходимых параметров.
+    for departure in list_departures:
+        for vak in list_vaks:
+            if departure['Name'] == vak['IdDeparture__Name']:
+                departure['vak'] = vak['id__count']
+                break
+        for tw in list_thesisWorld:
+            if departure['Name'] == tw['IdDeparture__Name']:
+                departure['tw'] = tw['id__count']
+                break
+        for tn in list_thesisNation:
+            if departure['Name'] == tn['IdDeparture__Name']:
+                departure['tn'] = tn['id__count']
+                break
+
     context = {'title': f"План-факт по науке в {institute.ShortName}",
-               'vaks': vaks,
-               'thesisWorld': thesisWorld,
-               'thesisNation': thesisNation
+               'departures': list_departures,
                }
     return render(request, 'authentication/report.html', context)
 
