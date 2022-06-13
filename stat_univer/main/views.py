@@ -276,7 +276,8 @@ def report(request, institute_id):
 
     # Получение данных из соответствующих таблиц
     institute = Institute.objects.get(id=institute_id)
-    departures = Departure.objects.filter(IdInstitute=institute_id).values('id', 'Name')
+    departures = Departure.objects.filter(IdInstitute=institute_id).values(
+        'id', 'Name', 'PlanVak', 'PlanthesisWorld', 'PlanthesisNation')
     vaks = VAK.objects.filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
     thesisWorld = Thesis.objects.filter(Type='M').filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
     thesisNation = Thesis.objects.filter(Type='N').filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))

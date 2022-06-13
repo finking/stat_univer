@@ -115,6 +115,11 @@ class Departure(models.Model):
         on_delete=models.SET_NULL, null=True, help_text='Выберите название института.'
     )
 
+    PlanVak = models.IntegerField('Публикации ВАК. План', default=0)
+    PlanthesisWorld = models.IntegerField('Тезисы в Межд. конференциях. План', default=0)
+    PlanthesisNation = models.IntegerField('Тезисы в Нац. конференциях. План', default=0)
+    PlanMonograph = models.IntegerField('Монографии. План', default=0)
+
     class Meta:
         verbose_name = "Кафедру"
         verbose_name_plural = "Кафедры"
