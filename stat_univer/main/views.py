@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.shortcuts import render, redirect
 from .models import Institute, Conference, Employee, FAQ, VAK, Thesis, Departure
 from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm
@@ -8,7 +8,7 @@ from datetime import datetime
 from xlsxwriter.workbook import Workbook
 import io
 import logging
-from .utils import dict_from_tuple, binary, MONTH, STATUS, COUNTRY
+from .utils import dict_from_tuple, binary, MONTH, STATUS, COUNTRY, InstituteTemplate, DepartureTemplate
 from django.contrib.auth import authenticate, login, logout
 
 logger = logging.getLogger(__name__)
@@ -259,53 +259,117 @@ def edit_vak(request):
 def main(request):
     institutes = Institute.objects.all()
     vaks = VAK.objects.values('IdInstitute__Name').annotate(Count('id'))
+    # https://docs.djangoproject.com/en/4.0/topics/db/aggregation/#following-relationships-backwards
+    planVak = Institute.objects.annotate(total=Sum('departure__PlanVak'))
+    
     thesisWorld = Thesis.objects.filter(Type='M').values('IdInstitute__Name').annotate(Count('id'))
+    planthesisWorld = Institute.objects.annotate(total=Sum('departure__PlanthesisWorld'))
+    
     thesisNation = Thesis.objects.filter(Type='N').values('IdInstitute__Name').annotate(Count('id'))
+    planthesisNation = Institute.objects.annotate(total=Sum('departure__PlanthesisNation'))
+    
     logger.debug(f'Vaks: {vaks}, тезисы в междун. конф: {thesisWorld}, тезисы в нац.конф: {thesisNation}')
+    
+    total_list = []  # Список для хранения списка Институтов
+
+    for institute in institutes:
+        # Преобразование информации по публикациям для отображения на сайте
+        vak = get_publication('Количество публикаций в журналах ВАК', institute, planVak, vaks)
+        tw = get_publication('Количество тезисов в международных конференциях', institute, planthesisWorld, thesisWorld)
+        tn = get_publication('Количество тезисов в национальных конференциях', institute, planthesisNation, thesisNation)
+
+        values = {
+            'vak': vak,
+            'thesisWorld': tw,
+            'thesisNation': tn,
+        }
+
+        inst = InstituteTemplate(f'{institute}', institute.id, values)
+        
+        total_list.append(inst)
+        
     context = {'title': "План-факт по науке",
-               'institutes': institutes,
-               'vaks': vaks,
-               'thesisWorld': thesisWorld,
-               'thesisNation': thesisNation}
+               'total_list': total_list}
     logger.debug(context)
     return render(request, 'authentication/main.html', context)
+
+
+# Функция для преобразования информации по публикациям
+def get_publication(name, subdivision, planType, publicationType, type=0):
+    
+    # Плановый показатель
+    plan = 0
+    # planType есть только для институтов. Для кафедр считать иначе.
+    if planType:
+        for pt in planType:
+            if pt == subdivision:
+                plan = pt.total
+    else:
+        # Цифры от 1 до 3 означают Плна по статьям ВАК, Тезисам в междунар. или нац. конференциях соотвественно.
+        if type == 1:
+            plan = subdivision['PlanVak']
+        elif type == 2:
+            plan = subdivision['PlanthesisWorld']
+        elif type == 3:
+            plan = subdivision['PlanthesisNation']
+            
+    # Фактический показатель
+    fact = 0
+    for publication in publicationType:
+        if isinstance(subdivision, Institute):
+            if publication['IdInstitute__Name'] == f'{subdivision}':
+                fact = publication['id__count']
+        elif isinstance(subdivision, dict): # TODO Разобраться почему Институты приходят как модель, а кафедры как словарь
+            if publication['IdDeparture__Name'] == subdivision['Name']:
+                fact = publication['id__count']
+                
+    # Расчет % выполнения
+    proc = 0
+    if plan != 0:
+        proc = round(fact / plan * 100, 2)
+    
+    data = {
+        'name': name, # Название показателя
+        'plan': plan,
+        'fact': fact,
+        'proc': proc,
+    }
+    return data
 
 
 # Отчет по кафедрам для каждого института
 def report(request, institute_id):
 
     # Получение данных из соответствующих таблиц
-    institute = Institute.objects.get(id=institute_id)
     departures = Departure.objects.filter(IdInstitute=institute_id).values(
         'id', 'Name', 'PlanVak', 'PlanthesisWorld', 'PlanthesisNation')
     vaks = VAK.objects.filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
-    thesisWorld = Thesis.objects.filter(Type='M').filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
-    thesisNation = Thesis.objects.filter(Type='N').filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
+    thesisWorld = Thesis.objects.filter(Type='M').filter(IdInstitute=institute_id).values(
+        'IdDeparture__Name').annotate(Count('id'))
+    thesisNation = Thesis.objects.filter(Type='N').filter(IdInstitute=institute_id).values(
+        'IdDeparture__Name').annotate(Count('id'))
 
-    # Преобразование QuerySet в List
-    list_thesisNation = list(thesisNation)
-    list_departures = list(departures)
-    list_vaks = list(vaks)
-    list_thesisWorld = list(thesisWorld)
+    # Добавление в список кафедр необходимых параметров.
+    total_list = []
 
-    # Добавление в список кафедр, необходимых параметров.
-    for departure in list_departures:
-        for vak in list_vaks:
-            if departure['Name'] == vak['IdDeparture__Name']:
-                departure['vak'] = vak['id__count']
-                break
-        for tw in list_thesisWorld:
-            if departure['Name'] == tw['IdDeparture__Name']:
-                departure['tw'] = tw['id__count']
-                break
-        for tn in list_thesisNation:
-            if departure['Name'] == tn['IdDeparture__Name']:
-                departure['tn'] = tn['id__count']
-                break
+    for departure in departures:
+        # Преобразование информации по публикациям для отображения на сайте
+        vak = get_publication('Количество публикаций в журналах ВАК', departure, False, vaks, 1)
+        tw = get_publication('Количество тезисов в международных конференциях', departure, False, thesisWorld, 2)
+        tn = get_publication('Количество тезисов в национальных конференциях', departure, False, thesisNation, 3)
 
-    context = {'title': f"План-факт по науке в {institute.ShortName}",
-               'departures': list_departures,
-               }
+        values = {
+            'vak': vak,
+            'thesisWorld': tw,
+            'thesisNation': tn,
+        }
+
+        depart = DepartureTemplate(departure['Name'], values)
+        total_list.append(depart)
+ 
+    context = {'title': "План-факт по науке",
+               'total_list': total_list}
+    logger.debug(context)
     return render(request, 'authentication/report.html', context)
 
 

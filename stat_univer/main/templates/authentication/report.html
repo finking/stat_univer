@@ -29,39 +29,26 @@
                 </tr>
                 </thead>
              <tbody>
-             {% for dep in departures %}
+             {% for department in total_list %}
                 <tr class="table-primary">
-                    <td colspan="4"> {{ dep.Name }}</td>
+                    <td colspan="4"> {{ department.name }}</td>
                 </tr>
-                 {% if dep.vak %}
+                {% for k, value in department.values.items %}
+
                     <tr class="table-light">
-                        <td style="padding-left: 25px;"> Количество публикаций в журналах ВАК </td>
-                        <td> {{ dep.PlanVak }} </td>
-                        <td>{{ dep.vak}}</td>
-                        <td> 0 </td>
+                    <td style="padding-left: 25px;"> {{value.name}} </td>
+                    <td>{{ value.plan}}</td>
+                    <td>{{ value.fact }} </td>
+                    <td>{{ value.proc }} </td>
                     </tr>
-                {% endif %}
-                 {% if dep.tw %}
-                    <tr class="table-light">
-                        <td style="padding-left: 25px;"> Количество тезисов в международных конференциях </td>
-                        <td> {{ dep.PlanthesisWorld }} </td>
-                        <td>{{ dep.tw}}</td>
-                        <td> 0 </td>
-                    </tr>
-                {% endif %}
-                  {% if dep.tn %}
-                    <tr class="table-light">
-                        <td style="padding-left: 25px;"> Количество тезисов в национальных конференциях </td>
-                        <td> {{ dep.PlanthesisNation }} </td>
-                        <td>{{ dep.tn}}</td>
-                        <td> 0 </td>
-                    </tr>
-                {% endif %}
+
+                {% endfor %}
+
             {% endfor %}
 
              </tbody>
         </table>
-        <a href="{% url 'main' %}"> Назад к просмотру План-факт </a>
+        <a href="{% url 'main' %}"> Назад к просмотру План-факт Институтов </a>
     </div>
 </div>
 </div>

@@ -1,3 +1,15 @@
+class DepartureTemplate:
+    def __init__(self, name, values):
+        self.name = name
+        self.values = values
+
+
+class InstituteTemplate(DepartureTemplate):
+    def __init__(self, name, id, values):
+        super().__init__(name, values)
+        self.id = id
+        
+        
 STATUS = (
     ('', 'Выберите статус'),
     ('М', 'Международная'),
