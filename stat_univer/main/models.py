@@ -234,11 +234,10 @@ class Publication(models.Model):
                           blank=True,
                           null=True)
     
-    Accepted = models.BooleanField('Принято', default=False)
-    Points = models.FloatField('Количество баллов',
-                               blank=True,
-                               null=True)
-    Comment = models.TextField('Комментарий УКНИ',
+    Accepted = models.BooleanField('Принято: ', default=False)
+    Points = models.FloatField('Количество баллов: ',
+                               default=0)
+    Comment = models.TextField('Комментарий УКНИ: ',
                                blank=True,
                                null=True)
     

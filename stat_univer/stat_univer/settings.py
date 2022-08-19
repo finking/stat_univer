@@ -38,6 +38,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 ALLOWED_HOSTS = []
 
+# Переадресация в случае посещения страницы, требующей авторизацию
+LOGIN_URL = 'login'
 
 # Application definition
 

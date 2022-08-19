@@ -211,8 +211,8 @@ class VAKForm(ModelForm):
                 'placeholder': 'https://',
                 # 'required': False
             }),
-            'Accepted': Select(attrs={
-                'class': 'form-select',
+            'Accepted': CheckboxInput(attrs={
+                'class': 'form-check-input',
                 'id': 'Accepted',
                 'required': False
             }),

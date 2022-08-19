@@ -31,7 +31,9 @@
              <tbody>
              {% for department in total_list %}
                 <tr class="table-primary">
-                    <td colspan="4"> {{ department.name }}</td>
+                    <td colspan="4">
+                        <a href="{% url 'catalogue' department_id=department.id type='vak' %}"> {{ department.name }} </a>
+                    </td>
                 </tr>
                 {% for k, value in department.values.items %}
 

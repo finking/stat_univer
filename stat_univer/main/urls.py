@@ -16,8 +16,9 @@ urlpatterns = [
     path('logout_user', views.logout_user, name='logout'),
     path('profile', views.profile, name='profile'),
     path('vak', views.vak, name='vak'),
-    path('edit_vak', views.edit_vak, name='edit_vak'),
+    path('edit_vak/<int:publication_id>', views.edit_vak, name='edit_vak'),
     path('main', views.main, name='main'),
     path('thesis', views.thesis, name='thesis'),
     path('report/<int:institute_id>', views.report, name='report'),
+    path('catalogue/<int:department_id>/<str:type>', views.catalogue, name='catalogue'),
 ]

@@ -1,13 +1,8 @@
 class DepartureTemplate:
-    def __init__(self, name, values):
+    def __init__(self, id, name, values):
+        self.id = id
         self.name = name
         self.values = values
-
-
-class InstituteTemplate(DepartureTemplate):
-    def __init__(self, name, id, values):
-        super().__init__(name, values)
-        self.id = id
         
         
 STATUS = (

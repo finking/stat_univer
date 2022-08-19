@@ -1,0 +1,59 @@
+{% extends 'main/base.html'  %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+{% include 'authentication/menu.html' %}
+<div class="col-md-8">
+    <h1 class="text-center alert alert-primary">{{ title }}</h1>
+    {% if messages %}
+        {% for message in messages%}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor%}
+    {% endif%}
+
+    <div class="col-12">
+        <h3 class="text-center">{{ depart }}</h3>
+        <table class="table">
+              <thead>
+                <tr class="bw d-flex">
+                  <th scope="col" class="col-5">Название</th>
+                  <th scope="col" class="col-1">Принято</th>
+
+                  <th scope="col" class="col-1">Баллы</th>
+                  <th scope="col" class="col-5">Комментарии УКНИ </th>
+
+                </tr>
+                </thead>
+             <tbody>
+ <!-- https://stackoverflow.com/questions/25385289/how-to-set-the-size-of-a-column-in-a-bootstrap-responsive-table-->
+             {% for publication in publications %}
+                <tr class="table-light d-flex">
+
+                    {% if  publication.Accepted%}
+                      <td class="col-5">
+                        {{ publication.Name }}
+                      </td>
+                      <td class="col-1"> Да </td>
+                    {% else %}
+                      <td class="col-5">
+                        <a href="{% url 'edit_vak' publication_id=publication.id %}"> {{ publication.Name }} </a>
+                      </td>
+                      <td class="col-1"> Нет </td>
+                    {% endif%}
+                  <td class="col-1">{{ publication.Points }}</td>
+                  <td class="col-5">{{ publication.Comment }}</td>
+                </tr>
+            {% endfor%}
+             </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

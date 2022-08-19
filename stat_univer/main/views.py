@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
 from django.shortcuts import render, redirect
 from .models import Institute, Conference, Employee, FAQ, VAK, Thesis, Departure
@@ -8,7 +9,7 @@ from datetime import datetime
 from xlsxwriter.workbook import Workbook
 import io
 import logging
-from .utils import dict_from_tuple, binary, MONTH, STATUS, COUNTRY, InstituteTemplate, DepartureTemplate
+from .utils import dict_from_tuple, binary, MONTH, STATUS, COUNTRY, DepartureTemplate
 from django.contrib.auth import authenticate, login, logout
 
 logger = logging.getLogger(__name__)
@@ -165,6 +166,7 @@ def logout_user(request):
     return redirect('login')
 
 
+@login_required
 def profile(request):
     logger.info('Загрузка страницы профиля.')
     
@@ -216,12 +218,14 @@ def thesis(request):
     return render(request, 'authentication/thesis.html', context)
 
 
-def edit_vak(request):
+@login_required
+def edit_vak(request, publication_id):
     logger.info('Загрузка страницы редактирования ВАК.')
     error = ''
 
+    vak_queryset = VAK.objects.get(pk=publication_id)
     if request.method == 'POST':
-        form = VAKForm(request.POST)
+        form = VAKForm(request.POST, instance=vak_queryset)
         if form.is_valid():
             form.save()
             messages.success(request, 'Публикация отредактирована!')
@@ -232,30 +236,31 @@ def edit_vak(request):
     else:
         # Словарь для заполнения формы
         vak_initial = {}
-        try:
-            vak_queryset = VAK.objects.get(id=1) # Получение данных из базы данных
-            logger.debug(f'Загрузка публикации ВАК: {vak_queryset}')
-            for key, value in vak_queryset.__dict__.items():
-                if value:
-                    vak_initial[key] = value
-                    if key == 'IdInstitute_id':
-                        vak_initial['IdInstitute'] = value
-                    elif key == 'IdDeparture_id':
-                        vak_initial['IdDeparture'] = value
-            logger.debug(f'Начальные данные: {vak_initial}')
 
-        except Exception as e:
-            logger.exception(f'Загрузка конференций не удалась. Ошибка: {e}')
+        # vak_queryset = VAK.objects.get(pk=publication_id) # Получение данных из базы данных
+        logger.debug(f'Загрузка публикации ВАК: {vak_queryset}')
+        for key, value in vak_queryset.__dict__.items():
+            if value:
+                vak_initial[key] = value
+                # Для отображения в форме Института и кафедры:
+                if key == 'IdInstitute_id':
+                    vak_initial['IdInstitute'] = value
+                elif key == 'IdDeparture_id':
+                    vak_initial['IdDeparture'] = value
+        logger.debug(f'Начальные данные: {vak_initial}')
+
         form = VAKForm(initial=vak_initial)
     
     context = {'title': "Редактирование статьи ВАК",
                'form': form,
-               'error': error}
+               'error': error,
+               'id': publication_id}
     logger.debug(context)
     return render(request, 'authentication/edit_vak.html', context)
 
 
 # Отчет по институтам
+@login_required(redirect_field_name='login_user')
 def main(request):
     institutes = Institute.objects.all()
     vaks = VAK.objects.values('IdInstitute__Name').annotate(Count('id'))
@@ -284,7 +289,7 @@ def main(request):
             'thesisNation': tn,
         }
 
-        inst = InstituteTemplate(f'{institute}', institute.id, values)
+        inst = DepartureTemplate(institute.id, f'{institute}', values)
         
         total_list.append(inst)
         
@@ -338,6 +343,7 @@ def get_publication(name, subdivision, planType, publicationType, type=0):
 
 
 # Отчет по кафедрам для каждого института
+@login_required
 def report(request, institute_id):
 
     # Получение данных из соответствующих таблиц
@@ -364,13 +370,35 @@ def report(request, institute_id):
             'thesisNation': tn,
         }
 
-        depart = DepartureTemplate(departure['Name'], values)
+        depart = DepartureTemplate(departure['id'], departure['Name'], values)
         total_list.append(depart)
  
     context = {'title': "План-факт по науке",
                'total_list': total_list}
     logger.debug(context)
     return render(request, 'authentication/report.html', context)
+
+
+@login_required
+def catalogue(request, department_id, type):
+    title = "Список публикаций"
+    publications = {}
+    if type == 'vak':
+        title = 'Список статей ВАК'
+        publications = VAK.objects.filter(IdDeparture=department_id).values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment')
+    elif type == 'thesis':
+        title = 'Список тезисов конференций'
+        publications = Thesis.objects.filter(IdDeparture=department_id).values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment', 'Type')
+        
+    depart = Departure.objects.get(pk=department_id)
+
+    context = {'title': title,
+               'publications': publications,
+               'depart': depart}
+    logger.debug(context)
+    return render(request, 'authentication/catalogue.html', context)
 
 
 def write_to_excel(conferences_queryset):
