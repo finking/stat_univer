@@ -32,13 +32,16 @@
              {% for department in total_list %}
                 <tr class="table-primary">
                     <td colspan="4">
-                        <a href="{% url 'catalogue' department_id=department.id type='vak' %}"> {{ department.name }} </a>
+                        {{ department.name }}
                     </td>
                 </tr>
                 {% for k, value in department.values.items %}
 
                     <tr class="table-light">
-                    <td style="padding-left: 25px;"> {{value.name}} </td>
+                    <td style="padding-left: 25px;">
+                        {{value.name}}
+                        ( <a href="{% url 'catalogue' department_id=department.id type=k %}">список</a> )
+                    </td>
                     <td>{{ value.plan}}</td>
                     <td>{{ value.fact }} </td>
                     <td>{{ value.proc }} </td>

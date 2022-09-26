@@ -390,9 +390,13 @@ def catalogue(request, department_id, type):
         title = 'Список статей ВАК'
         publications = VAK.objects.filter(IdDeparture=department_id).values(
             'id', 'Name', 'Accepted', 'Points', 'Comment')
-    elif type == 'thesis':
-        title = 'Список тезисов конференций'
-        publications = Thesis.objects.filter(IdDeparture=department_id).values(
+    elif type == 'thesisWorld':
+        title = 'Список тезисов международных конференций'
+        publications = Thesis.objects.filter(IdDeparture=department_id).filter(Type='M').values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment', 'Type')
+    elif type == 'thesisNation':
+        title = 'Список тезисов национальных конференций'
+        publications = Thesis.objects.filter(IdDeparture=department_id).filter(Type='N').values(
             'id', 'Name', 'Accepted', 'Points', 'Comment', 'Type')
         
     depart = Departure.objects.get(pk=department_id)
