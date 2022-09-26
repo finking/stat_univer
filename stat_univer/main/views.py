@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Sum
+from django.db.models import Sum
 from django.shortcuts import render, redirect
 from .models import Institute, Conference, Employee, FAQ, VAK, Thesis, Departure
 from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm
@@ -263,14 +263,16 @@ def edit_vak(request, publication_id):
 @login_required(redirect_field_name='login_user')
 def main(request):
     institutes = Institute.objects.all()
-    vaks = VAK.objects.values('IdInstitute__Name').annotate(Count('id'))
+    vaks = VAK.objects.filter(Accepted=True).values('IdInstitute__Name').annotate(sum=Sum('Points'))
     # https://docs.djangoproject.com/en/4.0/topics/db/aggregation/#following-relationships-backwards
     planVak = Institute.objects.annotate(total=Sum('departure__PlanVak'))
     
-    thesisWorld = Thesis.objects.filter(Type='M').values('IdInstitute__Name').annotate(Count('id'))
+    thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).values('IdInstitute__Name').annotate(
+        sum=Sum('Points'))
     planthesisWorld = Institute.objects.annotate(total=Sum('departure__PlanthesisWorld'))
     
-    thesisNation = Thesis.objects.filter(Type='N').values('IdInstitute__Name').annotate(Count('id'))
+    thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).values('IdInstitute__Name').annotate(
+        sum=Sum('Points'))
     planthesisNation = Institute.objects.annotate(total=Sum('departure__PlanthesisNation'))
     
     logger.debug(f'Vaks: {vaks}, тезисы в междун. конф: {thesisWorld}, тезисы в нац.конф: {thesisNation}')
@@ -323,10 +325,10 @@ def get_publication(name, subdivision, planType, publicationType, type=0):
     for publication in publicationType:
         if isinstance(subdivision, Institute):
             if publication['IdInstitute__Name'] == f'{subdivision}':
-                fact = publication['id__count']
+                fact = publication['sum']
         elif isinstance(subdivision, dict): # TODO Разобраться почему Институты приходят как модель, а кафедры как словарь
             if publication['IdDeparture__Name'] == subdivision['Name']:
-                fact = publication['id__count']
+                fact = publication['sum']
                 
     # Расчет % выполнения
     proc = 0
@@ -349,11 +351,12 @@ def report(request, institute_id):
     # Получение данных из соответствующих таблиц
     departures = Departure.objects.filter(IdInstitute=institute_id).values(
         'id', 'Name', 'PlanVak', 'PlanthesisWorld', 'PlanthesisNation')
-    vaks = VAK.objects.filter(IdInstitute=institute_id).values('IdDeparture__Name').annotate(Count('id'))
-    thesisWorld = Thesis.objects.filter(Type='M').filter(IdInstitute=institute_id).values(
-        'IdDeparture__Name').annotate(Count('id'))
-    thesisNation = Thesis.objects.filter(Type='N').filter(IdInstitute=institute_id).values(
-        'IdDeparture__Name').annotate(Count('id'))
+    vaks = VAK.objects.filter(IdInstitute=institute_id).filter(Accepted=True).values('IdDeparture__Name').annotate(
+        sum=Sum('Points'))
+    thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).filter(IdInstitute=institute_id).values(
+        'IdDeparture__Name').annotate(sum=Sum('Points'))
+    thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).filter(IdInstitute=institute_id).values(
+        'IdDeparture__Name').annotate(sum=Sum('Points'))
 
     # Добавление в список кафедр необходимых параметров.
     total_list = []
