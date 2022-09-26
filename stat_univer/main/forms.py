@@ -156,8 +156,8 @@ class VAKForm(ModelForm):
 
     class Meta:
         model = VAK
-        fields = ['Name', 'Output', 'Tom', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url', 'Accepted',
-                  'Points', 'Comment', 'IdInstitute', 'IdDeparture']
+        fields = ['Name', 'Output', 'Tom', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url', 'IdInstitute',
+                  'IdDeparture', 'Accepted', 'Comment', 'Points']
 
         widgets = {
             'IdInstitute': Select(attrs={
@@ -233,8 +233,8 @@ class ThesisForm(ModelForm):
 
     class Meta:
         model = Thesis
-        fields = ['Type','Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url', 'Accepted',
-                  'Points', 'Comment', 'IdInstitute', 'IdDeparture']
+        fields = ['Type','Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url', 'IdInstitute',
+                  'IdDeparture', 'Accepted', 'Points', 'Comment']
 
         widgets = {
             'IdInstitute': Select(attrs={
