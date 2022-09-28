@@ -170,7 +170,7 @@ def logout_user(request):
 def profile(request):
     logger.info('Загрузка страницы профиля.')
     
-    context = {'title': "Профиль сотрудника"}
+    context = {'title': "Профиль"}
 
     return render(request, 'authentication/profile.html', context)
 
@@ -212,7 +212,7 @@ def thesis(request):
     else:
         form = ThesisForm()
 
-    context = {'title': "Добавление тезисов конференции",
+    context = {'title': "Добавление тезисов конференций",
                'form': form}
     logger.debug(context)
     return render(request, 'authentication/thesis.html', context)
