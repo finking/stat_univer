@@ -22,7 +22,7 @@
         <h4 class="mb-3 text-primary ">{{ title }}</h4>
         {% if perms.main.change_vak %}
             <p>Поля выделенные <b>жирным </b> являются обязательными.</p>
-            <form action="{% url 'edit_vak' publication_id=id %}" method="post">
+            <form action="{% url 'edit' publication_id=id type=type %}" method="post">
               {% csrf_token %}
               <div class="row g-3">
 

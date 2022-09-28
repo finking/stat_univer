@@ -219,13 +219,27 @@ def thesis(request):
 
 
 @login_required
-def edit_vak(request, publication_id):
+def edit(request, publication_id, type):
     logger.info('Загрузка страницы редактирования ВАК.')
     error = ''
+    title = ''
 
-    vak_queryset = VAK.objects.get(pk=publication_id)
+    if type == 'vak':
+        title = "Редактирование статьи ВАК"
+        _queryset = VAK.objects.get(pk=publication_id)
+    elif type == 'thesisWorld':
+        title = 'Редактирование тезисов международных конференций'
+        _queryset = Thesis.objects.get(pk=publication_id)
+    elif type == 'thesisNation':
+        title = 'Редактирование тезисов национальных конференций'
+        _queryset = Thesis.objects.get(pk=publication_id)
+        
     if request.method == 'POST':
-        form = VAKForm(request.POST, instance=vak_queryset)
+        if type == 'vak':
+            form = VAKForm(request.POST, instance=_queryset)
+        elif type == 'thesisWorld' or type == 'thesisNation':
+            form = ThesisForm(request.POST, instance=_queryset)
+            
         if form.is_valid():
             form.save()
             messages.success(request, 'Публикация отредактирована!')
@@ -235,28 +249,32 @@ def edit_vak(request, publication_id):
             logger.error(form.cleaned_data)
     else:
         # Словарь для заполнения формы
-        vak_initial = {}
+        initial = {}
 
         # vak_queryset = VAK.objects.get(pk=publication_id) # Получение данных из базы данных
-        logger.debug(f'Загрузка публикации ВАК: {vak_queryset}')
-        for key, value in vak_queryset.__dict__.items():
+        logger.debug(f'Загрузка публикации ВАК: {_queryset}')
+        for key, value in _queryset.__dict__.items():
             if value:
-                vak_initial[key] = value
+                initial[key] = value
                 # Для отображения в форме Института и кафедры:
                 if key == 'IdInstitute_id':
-                    vak_initial['IdInstitute'] = value
+                    initial['IdInstitute'] = value
                 elif key == 'IdDeparture_id':
-                    vak_initial['IdDeparture'] = value
-        logger.debug(f'Начальные данные: {vak_initial}')
+                    initial['IdDeparture'] = value
+        logger.debug(f'Начальные данные: {initial}')
 
-        form = VAKForm(initial=vak_initial)
+        if type == 'vak':
+            form = VAKForm(initial=initial)
+        elif type == 'thesisWorld' or type == 'thesisNation':
+            form = ThesisForm(initial=initial)
     
-    context = {'title': "Редактирование статьи ВАК",
+    context = {'title': title,
+               'type': type,
                'form': form,
                'error': error,
                'id': publication_id}
     logger.debug(context)
-    return render(request, 'authentication/edit_vak.html', context)
+    return render(request, 'authentication/edit.html', context)
 
 
 # Отчет по институтам
@@ -403,7 +421,8 @@ def catalogue(request, department_id, type):
 
     context = {'title': title,
                'publications': publications,
-               'depart': depart}
+               'depart': depart,
+               'type': type}
     logger.debug(context)
     return render(request, 'authentication/catalogue.html', context)
 
