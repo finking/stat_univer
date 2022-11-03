@@ -175,6 +175,7 @@ def profile(request):
     return render(request, 'authentication/profile.html', context)
 
 
+@login_required
 def vak(request):
     logger.info('Загрузка страницы добавления ВАК.')
     error = ''
@@ -197,6 +198,7 @@ def vak(request):
     return render(request, 'authentication/vak.html', context)
 
 
+@login_required
 def thesis(request):
     logger.info('Загрузка страницы добавления тезисов международных конференций.')
     error = ''
@@ -292,6 +294,12 @@ def main(request):
     thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).values('IdInstitute__Name').annotate(
         sum=Sum('Points'))
     planthesisNation = Institute.objects.annotate(total=Sum('departure__PlanthesisNation'))
+
+    planIncome = Institute.objects.annotate(total=Sum('departure__PlanIncome'))
+    factIncome = Institute.objects.annotate(total=Sum('departure__FactIncome'))
+    
+    planRID = Institute.objects.annotate(total=Sum('departure__PlanRID'))
+    factRID = Institute.objects.annotate(total=Sum('departure__FactRID'))
     
     logger.debug(f'Vaks: {vaks}, тезисы в междун. конф: {thesisWorld}, тезисы в нац.конф: {thesisNation}')
     
@@ -302,11 +310,16 @@ def main(request):
         vak = get_publication('Количество публикаций в журналах ВАК', institute, planVak, vaks)
         tw = get_publication('Количество тезисов в международных конференциях', institute, planthesisWorld, thesisWorld)
         tn = get_publication('Количество тезисов в национальных конференциях', institute, planthesisNation, thesisNation)
+  
+        income = get_data('Общий доход, руб.', institute, planIncome, factIncome)
+        rid = get_data('РИД', institute, planRID, factRID)
 
         values = {
             'vak': vak,
             'thesisWorld': tw,
             'thesisNation': tn,
+            'income': income,
+            'rid': rid
         }
 
         inst = DepartureTemplate(institute.id, f'{institute}', values)
@@ -322,22 +335,8 @@ def main(request):
 # Функция для преобразования информации по публикациям
 def get_publication(name, subdivision, planType, publicationType, type=0):
     
-    # Плановый показатель
-    plan = 0
-    # planType есть только для институтов. Для кафедр считать иначе.
-    if planType:
-        for pt in planType:
-            if pt == subdivision:
-                plan = pt.total
-    else:
-        # Цифры от 1 до 3 означают Плна по статьям ВАК, Тезисам в междунар. или нац. конференциях соотвественно.
-        if type == 1:
-            plan = subdivision['PlanVak']
-        elif type == 2:
-            plan = subdivision['PlanthesisWorld']
-        elif type == 3:
-            plan = subdivision['PlanthesisNation']
-            
+    plan = get_plan(planType, subdivision, type)
+
     # Фактический показатель
     fact = 0
     for publication in publicationType:
@@ -347,12 +346,9 @@ def get_publication(name, subdivision, planType, publicationType, type=0):
         elif isinstance(subdivision, dict): # TODO Разобраться почему Институты приходят как модель, а кафедры как словарь
             if publication['IdDeparture__Name'] == subdivision['Name']:
                 fact = publication['sum']
-                
-    # Расчет % выполнения
-    proc = 0
-    if plan != 0:
-        proc = round(fact / plan * 100, 2)
-    
+
+    proc = get_proc(fact, plan)
+
     data = {
         'name': name, # Название показателя
         'plan': plan,
@@ -368,7 +364,7 @@ def report(request, institute_id):
 
     # Получение данных из соответствующих таблиц
     departures = Departure.objects.filter(IdInstitute=institute_id).values(
-        'id', 'Name', 'PlanVak', 'PlanthesisWorld', 'PlanthesisNation')
+        'id', 'Name', 'PlanVak', 'PlanthesisWorld', 'PlanthesisNation', 'PlanIncome', 'FactIncome', 'PlanRID', 'FactRID')
     vaks = VAK.objects.filter(IdInstitute=institute_id).filter(Accepted=True).values('IdDeparture__Name').annotate(
         sum=Sum('Points'))
     thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).filter(IdInstitute=institute_id).values(
@@ -384,11 +380,15 @@ def report(request, institute_id):
         vak = get_publication('Количество публикаций в журналах ВАК', departure, False, vaks, 1)
         tw = get_publication('Количество тезисов в международных конференциях', departure, False, thesisWorld, 2)
         tn = get_publication('Количество тезисов в национальных конференциях', departure, False, thesisNation, 3)
+        income = get_data('Общий доход, руб.', departure, False, False, 1)
+        rid = get_data('РИД', departure, False, False, 2)
 
         values = {
             'vak': vak,
             'thesisWorld': tw,
             'thesisNation': tn,
+            'income': income,
+            'rid': rid
         }
 
         depart = DepartureTemplate(departure['id'], departure['Name'], values)
@@ -425,6 +425,64 @@ def catalogue(request, department_id, type):
                'type': type}
     logger.debug(context)
     return render(request, 'authentication/catalogue.html', context)
+
+
+# Функция для преобразования информации по Доходу и РИДам
+def get_data(name, subdivision, planType, factType, type=0):
+    plan = 0
+    fact = 0
+    
+    # Для кафедр planType равен False
+    if planType:
+        plan = get_plan(planType, subdivision, type)
+        fact = get_plan(factType, subdivision, type)
+    else:
+        if type == 1:
+            plan = subdivision['PlanIncome']
+            fact = subdivision['FactIncome']
+        elif type == 2:
+            plan = subdivision['PlanRID']
+            fact = subdivision['FactRID']
+    
+    proc = get_proc(fact, plan)
+    
+    data = {
+        'name': name,  # Название показателя
+        'plan': plan,
+        'fact': fact,
+        'proc': proc,
+    }
+    
+    return data
+
+
+# Расчет процента выполнения плана
+def get_proc(fact, plan):
+    # Расчет % выполнения
+    proc = 0
+    if plan != 0:
+        proc = round(fact / plan * 100, 2)
+    return proc
+
+
+# Расчет плановых показателей (а также факта для Дохода и Ридов)
+def get_plan(planType, subdivision, type):
+    # Плановый показатель
+    plan = 0
+    # planType есть только для институтов. Для кафедр считать иначе.
+    if planType:
+        for pt in planType:
+            if pt == subdivision:
+                plan = pt.total
+    else:
+        # Цифры от 1 до 3 означают Плна по статьям ВАК, Тезисам в междунар. или нац. конференциях соотвественно.
+        if type == 1:
+            plan = subdivision['PlanVak']
+        elif type == 2:
+            plan = subdivision['PlanthesisWorld']
+        elif type == 3:
+            plan = subdivision['PlanthesisNation']
+    return plan
 
 
 def write_to_excel(conferences_queryset):

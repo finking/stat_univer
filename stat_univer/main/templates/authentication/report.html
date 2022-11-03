@@ -40,7 +40,9 @@
                     <tr class="table-light">
                     <td style="padding-left: 25px;">
                         {{value.name}}
-                        ( <a href="{% url 'catalogue' department_id=department.id type=k %}">список</a> )
+                        {% if value.name != "Общий доход, руб." and value.name != "РИД" %}
+                            ( <a href="{% url 'catalogue' department_id=department.id type=k %}">список</a> )
+                        {% endif %}
                     </td>
                     <td>{{ value.plan}}</td>
                     <td>{{ value.fact }} </td>

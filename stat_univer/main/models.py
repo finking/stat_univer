@@ -115,10 +115,17 @@ class Departure(models.Model):
         on_delete=models.SET_NULL, null=True, help_text='Выберите название института.'
     )
 
+    # Плановые показатили для кафедры (Для дохода и РИДов еще и фактические).
     PlanVak = models.IntegerField('Публикации ВАК. План', default=0)
     PlanthesisWorld = models.IntegerField('Тезисы в Межд. конференциях. План', default=0)
     PlanthesisNation = models.IntegerField('Тезисы в Нац. конференциях. План', default=0)
     PlanMonograph = models.IntegerField('Монографии. План', default=0)
+    
+    PlanIncome = models.IntegerField('Плановый объем дохода, тыс.руб.', default=0)
+    FactIncome = models.IntegerField('Фактический объем дохода, тыс.руб.', default=0)
+    
+    PlanRID = models.IntegerField('РИД. План', default=0)
+    FactRID = models.IntegerField('РИД. Факт', default=0)
 
     class Meta:
         verbose_name = "Кафедру"
