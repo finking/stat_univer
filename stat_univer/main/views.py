@@ -14,6 +14,15 @@ from django.contrib.auth import authenticate, login, logout
 
 logger = logging.getLogger(__name__)
 
+BASE_FORMAT_PARAMS = {
+    'text_wrap': True,
+    'align': 'center',
+    'valign': 'vcenter',
+    'border': 1,
+    'font_name': 'Times New Roman',
+    'font_size': 12,
+}
+
 
 def index(request):
     logger.info('Загрузка главной страницы. Шаблон: index.html')
@@ -282,38 +291,41 @@ def edit(request, publication_id, type):
 # Отчет по институтам
 @login_required(redirect_field_name='login_user')
 def main(request):
+    total_list = get_info_institute()
+
+    context = {'title': "План-факт по науке",
+               'total_list': total_list}
+    logger.debug(context)
+    return render(request, 'authentication/main.html', context)
+
+
+def get_info_institute():
     institutes = Institute.objects.all()
     vaks = VAK.objects.filter(Accepted=True).values('IdInstitute__Name').annotate(sum=Sum('Points'))
     # https://docs.djangoproject.com/en/4.0/topics/db/aggregation/#following-relationships-backwards
     planVak = Institute.objects.annotate(total=Sum('departure__PlanVak'))
-    
     thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).values('IdInstitute__Name').annotate(
         sum=Sum('Points'))
     planthesisWorld = Institute.objects.annotate(total=Sum('departure__PlanthesisWorld'))
-    
     thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).values('IdInstitute__Name').annotate(
         sum=Sum('Points'))
     planthesisNation = Institute.objects.annotate(total=Sum('departure__PlanthesisNation'))
-
     planIncome = Institute.objects.annotate(total=Sum('departure__PlanIncome'))
     factIncome = Institute.objects.annotate(total=Sum('departure__FactIncome'))
-    
     planRID = Institute.objects.annotate(total=Sum('departure__PlanRID'))
     factRID = Institute.objects.annotate(total=Sum('departure__FactRID'))
-    
     logger.debug(f'Vaks: {vaks}, тезисы в междун. конф: {thesisWorld}, тезисы в нац.конф: {thesisNation}')
-    
     total_list = []  # Список для хранения списка Институтов
-
     for institute in institutes:
         # Преобразование информации по публикациям для отображения на сайте
         vak = get_publication('Количество публикаций в журналах ВАК', institute, planVak, vaks)
         tw = get_publication('Количество тезисов в международных конференциях', institute, planthesisWorld, thesisWorld)
-        tn = get_publication('Количество тезисов в национальных конференциях', institute, planthesisNation, thesisNation)
-  
+        tn = get_publication('Количество тезисов в национальных конференциях', institute, planthesisNation,
+                             thesisNation)
+        
         income = get_data('Общий доход, руб.', institute, planIncome, factIncome)
         rid = get_data('РИД', institute, planRID, factRID)
-
+        
         values = {
             'vak': vak,
             'thesisWorld': tw,
@@ -321,15 +333,11 @@ def main(request):
             'income': income,
             'rid': rid
         }
-
+        
         inst = DepartureTemplate(institute.id, f'{institute}', values)
         
         total_list.append(inst)
-        
-    context = {'title': "План-факт по науке",
-               'total_list': total_list}
-    logger.debug(context)
-    return render(request, 'authentication/main.html', context)
+    return total_list
 
 
 # Функция для преобразования информации по публикациям
@@ -362,19 +370,28 @@ def get_publication(name, subdivision, planType, publicationType, type=0):
 @login_required
 def report(request, institute_id):
 
+    total_list = get_info_departure(institute_id)
+
+    context = {'title': "План-факт по науке",
+               'total_list': total_list,
+               'institute_id': institute_id}
+    logger.debug(context)
+    return render(request, 'authentication/report.html', context)
+
+
+def get_info_departure(institute_id):
     # Получение данных из соответствующих таблиц
     departures = Departure.objects.filter(IdInstitute=institute_id).values(
-        'id', 'Name', 'PlanVak', 'PlanthesisWorld', 'PlanthesisNation', 'PlanIncome', 'FactIncome', 'PlanRID', 'FactRID')
+        'id', 'Name', 'PlanVak', 'PlanthesisWorld', 'PlanthesisNation', 'PlanIncome', 'FactIncome', 'PlanRID',
+        'FactRID')
     vaks = VAK.objects.filter(IdInstitute=institute_id).filter(Accepted=True).values('IdDeparture__Name').annotate(
         sum=Sum('Points'))
     thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).filter(IdInstitute=institute_id).values(
         'IdDeparture__Name').annotate(sum=Sum('Points'))
     thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).filter(IdInstitute=institute_id).values(
         'IdDeparture__Name').annotate(sum=Sum('Points'))
-
     # Добавление в список кафедр необходимых параметров.
     total_list = []
-
     for departure in departures:
         # Преобразование информации по публикациям для отображения на сайте
         vak = get_publication('Количество публикаций в журналах ВАК', departure, False, vaks, 1)
@@ -382,7 +399,7 @@ def report(request, institute_id):
         tn = get_publication('Количество тезисов в национальных конференциях', departure, False, thesisNation, 3)
         income = get_data('Общий доход, руб.', departure, False, False, 1)
         rid = get_data('РИД', departure, False, False, 2)
-
+        
         values = {
             'vak': vak,
             'thesisWorld': tw,
@@ -390,14 +407,10 @@ def report(request, institute_id):
             'income': income,
             'rid': rid
         }
-
+        
         depart = DepartureTemplate(departure['id'], departure['Name'], values)
         total_list.append(depart)
- 
-    context = {'title': "План-факт по науке",
-               'total_list': total_list}
-    logger.debug(context)
-    return render(request, 'authentication/report.html', context)
+    return total_list
 
 
 @login_required
@@ -568,3 +581,105 @@ def write_to_excel(conferences_queryset):
     workbook.close()
     output.seek(0)
     return output
+
+
+@login_required
+def export_pf_all(request):
+    logger.info('Экспорт План-факта Университета')
+    
+    objects_institutes = Institute.objects.all()
+    
+    dict_info = {}
+    for ins in objects_institutes:
+        info = get_info_departure(ins.id)
+        dict_info[ins.Name] = info
+
+    output = plan_fact_to_excel(dict_info)
+
+    response = HttpResponse(output.read(),
+                            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response['Content-Disposition'] = f"attachment; filename={datetime.now().strftime('%d-%m-%Y')}-plan_fact.xlsx"
+
+    output.close()
+
+    return response
+
+
+@login_required
+def export_pf(request, institute_id):
+
+    ins = Institute.objects.get(id=institute_id)
+    logger.info(f'Экспорт План-факта {ins}')
+    
+    dict_info = {}
+    info = get_info_departure(ins.id)
+    dict_info[ins.Name] = info
+
+    output = plan_fact_to_excel(dict_info)
+    
+    response = HttpResponse(output.read(),
+                            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response['Content-Disposition'] = f"attachment; filename={datetime.now().strftime('%d-%m-%Y')}-plan_fact-{ins.id}.xlsx"
+
+    output.close()
+
+    return response
+
+
+def plan_fact_to_excel(data):
+
+    output = io.BytesIO()
+    workbook = Workbook(output, {'in_memory': True})
+    workbook.remove_timezone = True
+    worksheet = workbook.add_worksheet()
+    write_headers(workbook, worksheet)
+
+    row_num = 2
+    col_num = 0
+    col_finish = 18
+    
+    for name, values in data.items():
+
+        worksheet.merge_range(row_num, col_num, row_num, col_finish, name)
+        row_num += 1
+        for department in values:
+            worksheet.write(row_num, col_num, department.name)
+    
+            parameter_list = ['vak', 'thesisWorld', 'thesisNation', 'income', 'rid']
+            col_list = ['plan', 'fact', 'proc']
+            col_start = 1
+            
+            for parameter in parameter_list:
+                for col in col_list:
+                    worksheet.write(row_num, col_start, department.values[parameter][col])
+                    col_start += 1
+            row_num += 1
+        
+    workbook.close()
+    output.seek(0)
+    return output
+
+
+# Запись заголовков для план-факта
+def write_headers(workbook, worksheet):
+    header_format = workbook.add_format(BASE_FORMAT_PARAMS)
+    worksheet.merge_range('A1:A2', 'Структурное подразделение', header_format)
+    worksheet.set_column('A:A', 28)
+    worksheet.set_row(0, 50)
+    worksheet.merge_range('B1:D1', 'Публикации ВАК, шт.', header_format)
+    worksheet.set_column('B1:D1', 10)
+    worksheet.merge_range('E1:G1', 'Тезисы докладов на международных конференциях, шт.', header_format)
+    worksheet.merge_range('H1:J1', 'Тезисы докладов на национальных  конференциях, шт.', header_format)
+    worksheet.merge_range('K1:M1', 'Доход, руб.', header_format)
+    worksheet.merge_range('N1:P1', 'РИД/Патент', header_format)
+    # worksheet.merge_range('Q1:S1', '', header_format)
+
+    row_num = 1
+    col_start = 1
+    col_finish = 17
+    _list = ['План', 'Факт', '% Выпол.']
+    for cell_value in _list:
+        for col_num in range(col_start, col_finish, 3):
+            worksheet.write(row_num, col_num, cell_value, header_format)
+        col_start += 1
+        col_finish += 1
