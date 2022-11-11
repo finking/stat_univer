@@ -243,7 +243,8 @@ class Publication(models.Model):
     
     Accepted = models.BooleanField('Принято: ', default=False)
     Points = models.FloatField('Количество баллов: ',
-                               default=0)
+                               default=0,
+                               blank=True)
     Comment = models.TextField('Комментарий УКНИ: ',
                                blank=True,
                                null=True)
@@ -295,10 +296,18 @@ class Thesis(Publication):
     
     
 class Monograph(Publication):
+    class Meta:
+        verbose_name = "Монография"
+        verbose_name_plural = "Монографии"
+    
+    def __str__(self):
+        return self.Name
+    
+    Name = models.CharField('Название монографии', max_length=250)
+    
     Output = models.CharField('ISBN',
-                              max_length=100,
-                              blank=True,
-                              null=True)
+                              max_length=100)
+    
     Url = models.URLField('Ссылка на Ринц или на файл pdf, загруженный на стороннем ресурсе',
                           help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
                           blank=True,

@@ -2,8 +2,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.shortcuts import render, redirect
-from .models import Institute, Conference, Employee, FAQ, VAK, Thesis, Departure
-from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm
+from .models import Institute, Conference, Employee, FAQ, VAK, Thesis, Departure, Monograph
+from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm, MonographForm
 from django.http import HttpResponse
 from datetime import datetime
 from xlsxwriter.workbook import Workbook
@@ -218,7 +218,8 @@ def thesis(request):
             messages.success(request, 'Публикация добавлена!')
             return redirect('profile')
         else:
-            error = 'Произошла ошибка. Данные публикации не отправлены.'
+            error = f'Произошла ошибка. Данные публикации не отправлены.{form.errors}'
+            messages.error(request, error)
             logger.error(form.cleaned_data)
     else:
         form = ThesisForm()
@@ -230,8 +231,31 @@ def thesis(request):
 
 
 @login_required
+def monograph(request):
+    logger.info('Загрузка страницы добавления монографий.')
+
+    if request.method == 'POST':
+        form = MonographForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Монография добавлена!')
+            return redirect('profile')
+        else:
+            error = f'Произошла ошибка. Данные по монографии не отправлены. {form.errors}'
+            messages.error(request, error)
+            logger.error(form.cleaned_data)
+    else:
+        form = MonographForm()
+
+    context = {'title': "Добавление монографии",
+               'form': form}
+    logger.debug(context)
+    return render(request, 'authentication/monograph.html', context)
+
+
+@login_required
 def edit(request, publication_id, type):
-    logger.info('Загрузка страницы редактирования ВАК.')
+    logger.info('Загрузка страницы редактирования публикации')
     error = ''
     title = ''
 
@@ -244,12 +268,17 @@ def edit(request, publication_id, type):
     elif type == 'thesisNation':
         title = 'Редактирование тезисов национальных конференций'
         _queryset = Thesis.objects.get(pk=publication_id)
+    elif type == 'monograph':
+        title = 'Редактирование монографии'
+        _queryset = Monograph.objects.get(pk=publication_id)
         
     if request.method == 'POST':
         if type == 'vak':
             form = VAKForm(request.POST, instance=_queryset)
         elif type == 'thesisWorld' or type == 'thesisNation':
             form = ThesisForm(request.POST, instance=_queryset)
+        elif type == 'monograph':
+            form = MonographForm(request.POST, instance=_queryset)
             
         if form.is_valid():
             form.save()
@@ -278,6 +307,8 @@ def edit(request, publication_id, type):
             form = VAKForm(initial=initial)
         elif type == 'thesisWorld' or type == 'thesisNation':
             form = ThesisForm(initial=initial)
+        elif type == 'monograph':
+            form = MonographForm(initial=initial)
     
     context = {'title': title,
                'type': type,
@@ -310,6 +341,9 @@ def get_info_institute():
     thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).values('IdInstitute__Name').annotate(
         sum=Sum('Points'))
     planthesisNation = Institute.objects.annotate(total=Sum('departure__PlanthesisNation'))
+    monograph = Monograph.objects.filter(Accepted=True).values('IdInstitute__Name').annotate(
+        sum=Sum('Points'))
+    planMonograph = Institute.objects.annotate(total=Sum('departure__PlanMonograph'))
     planIncome = Institute.objects.annotate(total=Sum('departure__PlanIncome'))
     factIncome = Institute.objects.annotate(total=Sum('departure__FactIncome'))
     planRID = Institute.objects.annotate(total=Sum('departure__PlanRID'))
@@ -322,6 +356,7 @@ def get_info_institute():
         tw = get_publication('Количество тезисов в международных конференциях', institute, planthesisWorld, thesisWorld)
         tn = get_publication('Количество тезисов в национальных конференциях', institute, planthesisNation,
                              thesisNation)
+        mo = get_publication('Количество монографий', institute, planMonograph, monograph)
         
         income = get_data('Общий доход, руб.', institute, planIncome, factIncome)
         rid = get_data('РИД', institute, planRID, factRID)
@@ -330,6 +365,7 @@ def get_info_institute():
             'vak': vak,
             'thesisWorld': tw,
             'thesisNation': tn,
+            'monograph': mo,
             'income': income,
             'rid': rid
         }
@@ -383,13 +419,15 @@ def get_info_departure(institute_id):
     # Получение данных из соответствующих таблиц
     departures = Departure.objects.filter(IdInstitute=institute_id).values(
         'id', 'Name', 'PlanVak', 'PlanthesisWorld', 'PlanthesisNation', 'PlanIncome', 'FactIncome', 'PlanRID',
-        'FactRID')
+        'FactRID', 'PlanMonograph')
     vaks = VAK.objects.filter(IdInstitute=institute_id).filter(Accepted=True).values('IdDeparture__Name').annotate(
         sum=Sum('Points'))
     thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).filter(IdInstitute=institute_id).values(
         'IdDeparture__Name').annotate(sum=Sum('Points'))
     thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).filter(IdInstitute=institute_id).values(
         'IdDeparture__Name').annotate(sum=Sum('Points'))
+    monograph = Monograph.objects.filter(IdInstitute=institute_id).filter(Accepted=True).values('IdDeparture__Name').annotate(
+        sum=Sum('Points'))
     # Добавление в список кафедр необходимых параметров.
     total_list = []
     for departure in departures:
@@ -397,6 +435,7 @@ def get_info_departure(institute_id):
         vak = get_publication('Количество публикаций в журналах ВАК', departure, False, vaks, 1)
         tw = get_publication('Количество тезисов в международных конференциях', departure, False, thesisWorld, 2)
         tn = get_publication('Количество тезисов в национальных конференциях', departure, False, thesisNation, 3)
+        mo = get_publication('Количество монографий', departure, False, monograph, 4)
         income = get_data('Общий доход, руб.', departure, False, False, 1)
         rid = get_data('РИД', departure, False, False, 2)
         
@@ -404,6 +443,7 @@ def get_info_departure(institute_id):
             'vak': vak,
             'thesisWorld': tw,
             'thesisNation': tn,
+            'monograph': mo,
             'income': income,
             'rid': rid
         }
@@ -429,6 +469,10 @@ def catalogue(request, department_id, type):
         title = 'Список тезисов национальных конференций'
         publications = Thesis.objects.filter(IdDeparture=department_id).filter(Type='N').values(
             'id', 'Name', 'Accepted', 'Points', 'Comment', 'Type')
+    elif type == 'monograph':
+        title = 'Список монографий'
+        publications = Monograph.objects.filter(IdDeparture=department_id).values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment')
         
     depart = Departure.objects.get(pk=department_id)
 
@@ -495,6 +539,8 @@ def get_plan(planType, subdivision, type):
             plan = subdivision['PlanthesisWorld']
         elif type == 3:
             plan = subdivision['PlanthesisNation']
+        elif type == 4:
+            plan = subdivision['PlanMonograph']
     return plan
 
 
@@ -632,7 +678,8 @@ def plan_fact_to_excel(data):
     workbook = Workbook(output, {'in_memory': True})
     workbook.remove_timezone = True
     worksheet = workbook.add_worksheet()
-    write_headers(workbook, worksheet)
+    _format = workbook.add_format(BASE_FORMAT_PARAMS)
+    write_headers(worksheet, _format)
 
     row_num = 2
     col_num = 0
@@ -645,13 +692,13 @@ def plan_fact_to_excel(data):
         for department in values:
             worksheet.write(row_num, col_num, department.name)
     
-            parameter_list = ['vak', 'thesisWorld', 'thesisNation', 'income', 'rid']
+            parameter_list = ['vak', 'thesisWorld', 'thesisNation', 'monograph', 'income', 'rid']
             col_list = ['plan', 'fact', 'proc']
             col_start = 1
             
             for parameter in parameter_list:
                 for col in col_list:
-                    worksheet.write(row_num, col_start, department.values[parameter][col])
+                    worksheet.write(row_num, col_start, department.values[parameter][col], _format)
                     col_start += 1
             row_num += 1
         
@@ -661,8 +708,8 @@ def plan_fact_to_excel(data):
 
 
 # Запись заголовков для план-факта
-def write_headers(workbook, worksheet):
-    header_format = workbook.add_format(BASE_FORMAT_PARAMS)
+def write_headers(worksheet, header_format):
+
     worksheet.merge_range('A1:A2', 'Структурное подразделение', header_format)
     worksheet.set_column('A:A', 28)
     worksheet.set_row(0, 50)
@@ -670,9 +717,9 @@ def write_headers(workbook, worksheet):
     worksheet.set_column('B1:D1', 10)
     worksheet.merge_range('E1:G1', 'Тезисы докладов на международных конференциях, шт.', header_format)
     worksheet.merge_range('H1:J1', 'Тезисы докладов на национальных  конференциях, шт.', header_format)
-    worksheet.merge_range('K1:M1', 'Доход, руб.', header_format)
-    worksheet.merge_range('N1:P1', 'РИД/Патент', header_format)
-    # worksheet.merge_range('Q1:S1', '', header_format)
+    worksheet.merge_range('K1:M1', 'Монографии', header_format)
+    worksheet.merge_range('N1:P1', 'Доход, руб.', header_format)
+    worksheet.merge_range('Q1:S1', 'РИД/Патент', header_format)
 
     row_num = 1
     col_start = 1

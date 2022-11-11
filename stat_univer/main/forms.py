@@ -1,4 +1,4 @@
-from .models import Conference, Institute, FAQ, VAK, Thesis
+from .models import Conference, Institute, FAQ, VAK, Thesis, Monograph
 from django.forms import ModelForm, TextInput, Select, URLInput, EmailInput, Textarea, NumberInput, CheckboxInput, Form, EmailField, FloatField
 
 
@@ -258,6 +258,77 @@ class ThesisForm(ModelForm):
                 'class': 'form-control',
                 'id': 'Output',
                 'placeholder': 'Введите полное название конференции'
+            }),
+            'Year': NumberInput(attrs={
+                'class': 'form-control',
+                'id': 'Year',
+                'placeholder': 'Введите год издания, например: 2021',
+            }),
+            'Pages': TextInput(attrs={
+                'class': 'form-control',
+                'id': 'Pages',
+                'placeholder': 'Например, 5-8',
+                'required': False
+            }),
+            'DepartmentSame': Textarea(attrs={
+                'class': 'form-control',
+                'id': 'DepartmentSame',
+                'placeholder': '(по возможности с указанием кафедры)'
+            }),
+            'DepartmentOther': Textarea(attrs={
+                'class': 'form-control',
+                'id': 'DepartmentOther',
+                'placeholder': '(по возможности с указанием кафедры)'
+            }),
+            'Url': URLInput(attrs={
+                'class': 'form-control',
+                'id': 'Url',
+                'placeholder': 'https://',
+                # 'required': False
+            }),
+            'Accepted': CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'id': 'Accepted',
+                'required': False
+            }),
+            'Points': NumberInput(attrs={
+                'class': 'form-control',
+                'id': 'Points',
+                'required': False
+            }),
+            'Comment': TextInput(attrs={
+                'class': 'form-control',
+                'id': 'Comment',
+                'required': False
+            }),
+        }
+
+
+class MonographForm(ModelForm):
+
+    class Meta:
+        model = Monograph
+        fields = ['Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url', 'IdInstitute',
+                  'IdDeparture', 'Accepted', 'Points', 'Comment']
+
+        widgets = {
+            'IdInstitute': Select(attrs={
+                'class': 'form-select',
+                'id': 'IdInstitute',
+            }),
+            'IdDeparture': Select(attrs={
+                'class': 'form-select',
+                'id': 'IdDeparture',
+            }),
+            'Name': TextInput(attrs={
+                'class': 'form-control ',
+                'id': 'Name',
+                'placeholder': 'Введите название монографии'
+            }),
+            'Output': TextInput(attrs={
+                'class': 'form-control',
+                'id': 'Output',
+                'placeholder': 'Введите ISBN'
             }),
             'Year': NumberInput(attrs={
                 'class': 'form-control',

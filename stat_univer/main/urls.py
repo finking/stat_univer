@@ -21,6 +21,7 @@ urlpatterns = [
     path('edit/<int:publication_id>/<str:type>', views.edit, name='edit'),
     path('main', views.main, name='main'),
     path('thesis', views.thesis, name='thesis'),
+    path('monograph', views.monograph, name='monograph'),
     path('report/<int:institute_id>', views.report, name='report'),
     path('catalogue/<int:department_id>/<str:type>', views.catalogue, name='catalogue'),
 ]

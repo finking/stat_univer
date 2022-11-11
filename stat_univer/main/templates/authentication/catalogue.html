@@ -19,7 +19,7 @@
     {% endif%}
 
     <div class="col-12">
-        <h3 class="text-center">{{ depart }}</h3>
+        <h3 class="text-center">  {{ depart.IdInstitute }} → {{ depart }}</h3>
         <table class="table">
               <thead>
                 <tr class="bw d-flex">
@@ -53,7 +53,7 @@
             {% endfor%}
              </tbody>
         </table>
-        <a href="{% url 'report' institute_id=depart.id %}"> Назад к просмотру к общему План-факту Кафедры </a>
+        <a href="{% url 'report' institute_id=depart.IdInstitute.id %}"> Назад к просмотру к общему План-факту Кафедры </a>
     </div>
 </div>
 </div>
