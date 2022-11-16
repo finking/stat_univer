@@ -187,7 +187,7 @@ def profile(request):
 @login_required
 def vak(request):
     logger.info('Загрузка страницы добавления ВАК.')
-    error = ''
+
     if request.method == 'POST':
         form = VAKForm(request.POST)
         if form.is_valid():
@@ -195,22 +195,23 @@ def vak(request):
             messages.success(request, 'Публикация добавлена!')
             return redirect('profile')
         else:
-            error = 'Произошла ошибка. Данные публикации не отправлены.'
+            error = f'Произошла ошибка. Данные публикации не отправлены.{form.errors}'
+            messages.error(request, error)
             logger.error(form.cleaned_data)
     else:
         form = VAKForm()
     
     context = {'title': "Добавление статьи ВАК",
-               'form': form,
-               'error': error}
+               'type': 'vak',
+               'form': form}
     logger.debug(context)
-    return render(request, 'authentication/vak.html', context)
+    return render(request, 'authentication/publication.html', context)
 
 
 @login_required
 def thesis(request):
     logger.info('Загрузка страницы добавления тезисов международных конференций.')
-    error = ''
+
     if request.method == 'POST':
         form = ThesisForm(request.POST)
         if form.is_valid():
@@ -225,9 +226,10 @@ def thesis(request):
         form = ThesisForm()
 
     context = {'title': "Добавление тезисов конференций",
+               'type': 'thesis',
                'form': form}
     logger.debug(context)
-    return render(request, 'authentication/thesis.html', context)
+    return render(request, 'authentication/publication.html', context)
 
 
 @login_required
@@ -248,9 +250,10 @@ def monograph(request):
         form = MonographForm()
 
     context = {'title': "Добавление монографии",
+               'type': 'monograph',
                'form': form}
     logger.debug(context)
-    return render(request, 'authentication/monograph.html', context)
+    return render(request, 'authentication/publication.html', context)
 
 
 @login_required
@@ -291,7 +294,6 @@ def edit(request, publication_id, type):
         # Словарь для заполнения формы
         initial = {}
 
-        # vak_queryset = VAK.objects.get(pk=publication_id) # Получение данных из базы данных
         logger.debug(f'Загрузка публикации ВАК: {_queryset}')
         for key, value in _queryset.__dict__.items():
             if value:
