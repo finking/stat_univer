@@ -298,10 +298,8 @@ def edit(request, publication_id, type):
         for key, value in _queryset.__dict__.items():
             if value:
                 initial[key] = value
-                # Для отображения в форме Института и кафедры:
-                if key == 'IdInstitute_id':
-                    initial['IdInstitute'] = value
-                elif key == 'IdDeparture_id':
+                # Для отображения названия кафедры:
+                if key == 'IdDeparture_id':
                     initial['IdDeparture'] = value
         logger.debug(f'Начальные данные: {initial}')
 
@@ -334,16 +332,16 @@ def main(request):
 
 def get_info_institute():
     institutes = Institute.objects.all()
-    vaks = VAK.objects.filter(Accepted=True).values('IdInstitute__Name').annotate(sum=Sum('Points'))
+    vaks = VAK.objects.filter(Accepted=True).values('IdDeparture__IdInstitute__Name').annotate(sum=Sum('Points'))
     # https://docs.djangoproject.com/en/4.0/topics/db/aggregation/#following-relationships-backwards
     planVak = Institute.objects.annotate(total=Sum('departure__PlanVak'))
-    thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).values('IdInstitute__Name').annotate(
+    thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).values('IdDeparture__IdInstitute__Name').annotate(
         sum=Sum('Points'))
     planthesisWorld = Institute.objects.annotate(total=Sum('departure__PlanthesisWorld'))
-    thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).values('IdInstitute__Name').annotate(
+    thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).values('IdDeparture__IdInstitute__Name').annotate(
         sum=Sum('Points'))
     planthesisNation = Institute.objects.annotate(total=Sum('departure__PlanthesisNation'))
-    monograph = Monograph.objects.filter(Accepted=True).values('IdInstitute__Name').annotate(
+    monograph = Monograph.objects.filter(Accepted=True).values('IdDeparture__IdInstitute__Name').annotate(
         sum=Sum('Points'))
     planMonograph = Institute.objects.annotate(total=Sum('departure__PlanMonograph'))
     planIncome = Institute.objects.annotate(total=Sum('departure__PlanIncome'))
@@ -387,7 +385,7 @@ def get_publication(name, subdivision, planType, publicationType, type=0):
     fact = 0
     for publication in publicationType:
         if isinstance(subdivision, Institute):
-            if publication['IdInstitute__Name'] == f'{subdivision}':
+            if publication['IdDeparture__IdInstitute__Name'] == f'{subdivision}':
                 fact = publication['sum']
         elif isinstance(subdivision, dict): # TODO Разобраться почему Институты приходят как модель, а кафедры как словарь
             if publication['IdDeparture__Name'] == subdivision['Name']:
@@ -422,14 +420,14 @@ def get_info_departure(institute_id):
     departures = Departure.objects.filter(IdInstitute=institute_id).values(
         'id', 'Name', 'PlanVak', 'PlanthesisWorld', 'PlanthesisNation', 'PlanIncome', 'FactIncome', 'PlanRID',
         'FactRID', 'PlanMonograph')
-    vaks = VAK.objects.filter(IdInstitute=institute_id).filter(Accepted=True).values('IdDeparture__Name').annotate(
-        sum=Sum('Points'))
-    thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).filter(IdInstitute=institute_id).values(
+    vaks = VAK.objects.filter(IdDeparture__IdInstitute=institute_id).filter(Accepted=True).values('IdDeparture__Name')\
+        .annotate(sum=Sum('Points'))
+    thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).filter(IdDeparture__IdInstitute=institute_id)\
+        .values('IdDeparture__Name').annotate(sum=Sum('Points'))
+    thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).filter(IdDeparture__IdInstitute=institute_id)\
+        .values('IdDeparture__Name').annotate(sum=Sum('Points'))
+    monograph = Monograph.objects.filter(IdDeparture__IdInstitute=institute_id).filter(Accepted=True).values(
         'IdDeparture__Name').annotate(sum=Sum('Points'))
-    thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).filter(IdInstitute=institute_id).values(
-        'IdDeparture__Name').annotate(sum=Sum('Points'))
-    monograph = Monograph.objects.filter(IdInstitute=institute_id).filter(Accepted=True).values('IdDeparture__Name').annotate(
-        sum=Sum('Points'))
     # Добавление в список кафедр необходимых параметров.
     total_list = []
     for departure in departures:

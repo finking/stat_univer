@@ -156,14 +156,10 @@ class VAKForm(ModelForm):
 
     class Meta:
         model = VAK
-        fields = ['Name', 'Output', 'Tom', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url', 'IdInstitute',
+        fields = ['Name', 'Output', 'Tom', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
                   'IdDeparture', 'Accepted', 'Comment', 'Points']
 
         widgets = {
-            'IdInstitute': Select(attrs={
-                'class': 'form-select',
-                'id': 'IdInstitute',
-            }),
             'IdDeparture': Select(attrs={
                 'class': 'form-select',
                 'id': 'IdDeparture',
@@ -221,7 +217,7 @@ class VAKForm(ModelForm):
                 'id': 'Points',
                 'required': False
             }),
-            'Comment': TextInput(attrs={
+            'Comment': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'Comment',
                 'required': False
@@ -233,14 +229,10 @@ class ThesisForm(ModelForm):
 
     class Meta:
         model = Thesis
-        fields = ['Type','Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url', 'IdInstitute',
+        fields = ['Type','Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
                   'IdDeparture', 'Accepted', 'Points', 'Comment']
 
         widgets = {
-            'IdInstitute': Select(attrs={
-                'class': 'form-select',
-                'id': 'IdInstitute',
-            }),
             'IdDeparture': Select(attrs={
                 'class': 'form-select',
                 'id': 'IdDeparture',
@@ -296,7 +288,7 @@ class ThesisForm(ModelForm):
                 'id': 'Points',
                 'required': False
             }),
-            'Comment': TextInput(attrs={
+            'Comment': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'Comment',
                 'required': False
@@ -308,14 +300,10 @@ class MonographForm(ModelForm):
 
     class Meta:
         model = Monograph
-        fields = ['Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url', 'IdInstitute',
+        fields = ['Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
                   'IdDeparture', 'Accepted', 'Points', 'Comment']
 
         widgets = {
-            'IdInstitute': Select(attrs={
-                'class': 'form-select',
-                'id': 'IdInstitute',
-            }),
             'IdDeparture': Select(attrs={
                 'class': 'form-select',
                 'id': 'IdDeparture',
@@ -355,7 +343,6 @@ class MonographForm(ModelForm):
                 'class': 'form-control',
                 'id': 'Url',
                 'placeholder': 'https://',
-                # 'required': False
             }),
             'Accepted': CheckboxInput(attrs={
                 'class': 'form-check-input',
@@ -367,7 +354,7 @@ class MonographForm(ModelForm):
                 'id': 'Points',
                 'required': False
             }),
-            'Comment': TextInput(attrs={
+            'Comment': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'Comment',
                 'required': False

@@ -230,3 +230,6 @@ fabric.properties
 
 # File with secret info
 stat_univer/stat_univer/.env
+
+# Dir with migrations
+stat_univer/main/migrations

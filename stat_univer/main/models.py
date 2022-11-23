@@ -249,11 +249,6 @@ class Publication(models.Model):
                                blank=True,
                                null=True)
     
-    IdInstitute = models.ForeignKey(
-        'Institute',
-        verbose_name='Институт',
-        on_delete=models.PROTECT, null=True, help_text='Выберите название института.'
-    )
 
     IdDeparture = models.ForeignKey(
         'Departure',
