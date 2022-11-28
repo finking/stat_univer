@@ -108,7 +108,7 @@ class Employee(models.Model):
 
 
 class Departure(models.Model):
-    Name = models.CharField('Название', max_length=70)
+    Name = models.CharField('Название', max_length=80)
     IdInstitute = models.ForeignKey(
         'Institute',
         verbose_name='Институт',
@@ -245,7 +245,7 @@ class Publication(models.Model):
     Points = models.FloatField('Количество баллов: ',
                                default=0,
                                blank=True)
-    Comment = models.TextField('Комментарий УКНИ: ',
+    Comment = models.TextField('Комментарий отдела статистики: ',
                                blank=True,
                                null=True)
     

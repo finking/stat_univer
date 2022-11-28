@@ -505,8 +505,8 @@ def get_data(name, subdivision, planType, factType, type=0):
     
     data = {
         'name': name,  # Название показателя
-        'plan': plan,
-        'fact': fact,
+        'plan': f'{plan:_}'.replace('_', ' '),  # https://miguendes.me/73-examples-to-help-you-master-pythons-f-strings#heading-how-to-format-a-number-with-spaces-as-decimal-separator
+        'fact': f'{fact:_}'.replace('_', ' '),
         'proc': proc,
     }
     
@@ -711,7 +711,7 @@ def plan_fact_to_excel(data):
 def write_headers(worksheet, header_format):
 
     worksheet.merge_range('A1:A2', 'Структурное подразделение', header_format)
-    worksheet.set_column('A:A', 28)
+    worksheet.set_column('A:A', 80)
     worksheet.set_row(0, 50)
     worksheet.merge_range('B1:D1', 'Публикации ВАК, шт.', header_format)
     worksheet.set_column('B1:D1', 10)
@@ -719,6 +719,7 @@ def write_headers(worksheet, header_format):
     worksheet.merge_range('H1:J1', 'Тезисы докладов на национальных  конференциях, шт.', header_format)
     worksheet.merge_range('K1:M1', 'Монографии', header_format)
     worksheet.merge_range('N1:P1', 'Доход, руб.', header_format)
+    worksheet.set_column('N:O', 15)
     worksheet.merge_range('Q1:S1', 'РИД/Патент', header_format)
 
     row_num = 1

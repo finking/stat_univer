@@ -157,7 +157,7 @@ class VAKForm(ModelForm):
     class Meta:
         model = VAK
         fields = ['Name', 'Output', 'Tom', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'IdDeparture', 'Accepted', 'Comment', 'Points']
+                  'IdDeparture', 'Accepted', 'Points', 'Comment']  # Порядок отображения полей
 
         widgets = {
             'IdDeparture': Select(attrs={
