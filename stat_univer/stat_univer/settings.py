@@ -41,6 +41,11 @@ ALLOWED_HOSTS = []
 # Переадресация в случае посещения страницы, требующей авторизацию
 LOGIN_URL = 'login'
 
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = env('EMAIL_HOST')
+
 # Application definition
 
 INSTALLED_APPS = [

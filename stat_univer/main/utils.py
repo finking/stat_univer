@@ -1,10 +1,39 @@
+from django.core.mail import send_mail
+
+# Adding setting
+# https://qna.habr.com/q/701205
+import environ
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+environ.Env.read_env()
+STAFF_MAIL_FROM = env('STAFF_MAIL_FROM')
+STAFF_MAIL_TO = env('STAFF_MAIL_TO')
+ERROR_LOG_FILENAME = 'log_error.log'
+
+
 class DepartureTemplate:
     def __init__(self, id, name, values):
         self.id = id
         self.name = name
         self.values = values
+
+
+def send_mail_staff(subject, url, department, new=True):
+    if new:
+        message = f'{department} добавила публикацию. Список всех публикаций данного типа: {url}'
+    else:
+        message = f'{department} внесла изменения: {url}'
         
-        
+    send_mail(
+        subject,
+        message,
+        STAFF_MAIL_FROM,
+        STAFF_MAIL_TO.split(','),
+        fail_silently=False,
+    )
+    
+    
 STATUS = (
     ('', 'Выберите статус'),
     ('М', 'Международная'),

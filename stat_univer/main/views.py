@@ -9,7 +9,7 @@ from datetime import datetime
 from xlsxwriter.workbook import Workbook
 import io
 import logging
-from .utils import dict_from_tuple, binary, MONTH, STATUS, COUNTRY, DepartureTemplate
+from .utils import dict_from_tuple, binary, MONTH, STATUS, COUNTRY, DepartureTemplate, send_mail_staff
 from django.contrib.auth import authenticate, login, logout
 
 logger = logging.getLogger(__name__)
@@ -193,6 +193,10 @@ def vak(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Публикация добавлена!')
+            url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/vak"
+            send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
+                            url,
+                            form.cleaned_data["IdDeparture"])
             return redirect('profile')
         else:
             error = f'Произошла ошибка. Данные публикации не отправлены.{form.errors}'
@@ -217,6 +221,14 @@ def thesis(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Публикация добавлена!')
+            form_type = 'thesisNation'
+            if form.cleaned_data['Type'] == 'M':
+                form_type = 'thesisWorld'
+                
+            url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/{form_type}"
+            send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
+                            url,
+                            form.cleaned_data["IdDeparture"])
             return redirect('profile')
         else:
             error = f'Произошла ошибка. Данные публикации не отправлены.{form.errors}'
@@ -241,6 +253,10 @@ def monograph(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Монография добавлена!')
+            url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/monograph"
+            send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
+                            url,
+                            form.cleaned_data["IdDeparture"])
             return redirect('profile')
         else:
             error = f'Произошла ошибка. Данные по монографии не отправлены. {form.errors}'
@@ -285,8 +301,13 @@ def edit(request, publication_id, type):
             
         if form.is_valid():
             form.save()
-            messages.success(request, 'Публикация отредактирована!')
-            return redirect('profile')
+            messages.success(request, 'Публикация отредактирована! Можете закрыть данную вкладку.')
+            send_mail_staff(f'{form.cleaned_data["IdDeparture"]} внесла изменения',
+                            request.build_absolute_uri(),
+                            form.cleaned_data["IdDeparture"],
+                            new=False)
+            # return redirect('profile')
+            return redirect(request.META.get('HTTP_REFERER', '/'))
         else:
             error = 'Произошла ошибка. Данные публикации не отправлены.'
             logger.error(form.cleaned_data)
