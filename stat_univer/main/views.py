@@ -302,11 +302,14 @@ def edit(request, publication_id, type):
         if form.is_valid():
             form.save()
             messages.success(request, 'Публикация отредактирована! Можете закрыть данную вкладку.')
-            send_mail_staff(f'{form.cleaned_data["IdDeparture"]} внесла изменения',
-                            request.build_absolute_uri(),
-                            form.cleaned_data["IdDeparture"],
-                            new=False)
-            # return redirect('profile')
+            
+            # Отправка письма только, если редактировал не админ.
+            if not request.user.is_staff:
+                send_mail_staff(f'{form.cleaned_data["IdDeparture"]} внесла изменения',
+                                request.build_absolute_uri(),
+                                form.cleaned_data["IdDeparture"],
+                                new=False)
+
             return redirect(request.META.get('HTTP_REFERER', '/'))
         else:
             error = 'Произошла ошибка. Данные публикации не отправлены.'
