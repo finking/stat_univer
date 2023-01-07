@@ -30,12 +30,15 @@
                 {% if f.id_for_label == "Points" or f.id_for_label == "Comment" or f.id_for_label == "Accepted" %}
 
                 {% else %}
-                {% if f.field.required %}
-                    <label for="{{ f.id_for_label }}" class="form-label fw-bold">{{ f.label }}</label>
-                {% else %}
-                    <label for="{{ f.id_for_label }}" class="form-label">{{ f.label }}</label>
-                {% endif %}
-                  {{ f }}
+                    {% if f.field.required %}
+                        {% if f.id_for_label == "Author" or f.id_for_label == "TimeCreate" %}
+                        {% else %}
+                        <label for="{{ f.id_for_label }}" class="form-label fw-bold">{{ f.label }}</label>
+                        {% endif %}
+                    {% else %}
+                        <label for="{{ f.id_for_label }}" class="form-label">{{ f.label }}</label>
+                    {% endif %}
+                    {{ f }}
                 {% endif %}
               </div>
             {% endfor %}

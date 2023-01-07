@@ -1,5 +1,6 @@
 from .models import Conference, Institute, FAQ, VAK, Thesis, Monograph
-from django.forms import ModelForm, TextInput, Select, URLInput, EmailInput, Textarea, NumberInput, CheckboxInput, Form, EmailField, FloatField
+from django.forms import ModelForm, TextInput, Select, URLInput, EmailInput, Textarea, NumberInput, \
+    CheckboxInput, Form, EmailField, DateTimeInput
 
 
 class ConferenceForm(ModelForm):
@@ -157,7 +158,7 @@ class VAKForm(ModelForm):
     class Meta:
         model = VAK
         fields = ['Name', 'Output', 'Tom', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'IdDeparture', 'Accepted', 'Points', 'Comment']  # Порядок отображения полей
+                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author', 'TimeCreate']  # Порядок отображения полей
 
         widgets = {
             'IdDeparture': Select(attrs={
@@ -222,6 +223,16 @@ class VAKForm(ModelForm):
                 'id': 'Comment',
                 'required': False
             }),
+            'Author': Select(attrs={
+                'class': 'form-select',
+                'id': 'Author',
+                'hidden': True
+            }),
+            'TimeCreate': DateTimeInput(attrs={
+                'class': 'form-control',
+                'id': 'TimeCreate',
+                'hidden': True
+            })
         }
 
 
@@ -230,7 +241,7 @@ class ThesisForm(ModelForm):
     class Meta:
         model = Thesis
         fields = ['Type','Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'IdDeparture', 'Accepted', 'Points', 'Comment']
+                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author', 'TimeCreate']
 
         widgets = {
             'IdDeparture': Select(attrs={
@@ -293,6 +304,16 @@ class ThesisForm(ModelForm):
                 'id': 'Comment',
                 'required': False
             }),
+            'Author': Select(attrs={
+                'class': 'form-select',
+                'id': 'Author',
+                'hidden': True
+            }),
+            'TimeCreate': DateTimeInput(attrs={
+                'class': 'form-control',
+                'id': 'TimeCreate',
+                'hidden': True
+            })
         }
 
 
@@ -301,7 +322,7 @@ class MonographForm(ModelForm):
     class Meta:
         model = Monograph
         fields = ['Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'IdDeparture', 'Accepted', 'Points', 'Comment']
+                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author', 'TimeCreate']
 
         widgets = {
             'IdDeparture': Select(attrs={
@@ -359,4 +380,14 @@ class MonographForm(ModelForm):
                 'id': 'Comment',
                 'required': False
             }),
+            'Author': Select(attrs={
+                'class': 'form-select',
+                'id': 'Author',
+                'hidden': True
+            }),
+            'TimeCreate': DateTimeInput(attrs={
+                'class': 'form-control',
+                'id': 'TimeCreate',
+                'hidden': True
+            })
         }

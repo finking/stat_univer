@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.shortcuts import render, redirect
+from django.utils import timezone
 from .models import Institute, Conference, Employee, FAQ, VAK, Thesis, Departure, Monograph
 from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm, MonographForm
 from django.http import HttpResponse
@@ -196,14 +197,16 @@ def vak(request):
             url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/vak"
             send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
                             url,
-                            form.cleaned_data["IdDeparture"])
+                            form.cleaned_data["IdDeparture"],
+                            request.user.last_name,
+                            )
             return redirect('profile')
         else:
             error = f'Произошла ошибка. Данные публикации не отправлены.{form.errors}'
             messages.error(request, error)
             logger.error(form.cleaned_data)
     else:
-        form = VAKForm()
+        form = VAKForm(initial={'Author': request.user, 'TimeCreate': timezone.now()})
     
     context = {'title': "Добавление статьи ВАК",
                'type': 'vak',
@@ -228,14 +231,16 @@ def thesis(request):
             url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/{form_type}"
             send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
                             url,
-                            form.cleaned_data["IdDeparture"])
+                            form.cleaned_data["IdDeparture"],
+                            request.user.last_name,
+                            )
             return redirect('profile')
         else:
             error = f'Произошла ошибка. Данные публикации не отправлены.{form.errors}'
             messages.error(request, error)
             logger.error(form.cleaned_data)
     else:
-        form = ThesisForm()
+        form = ThesisForm(initial={'Author': request.user, 'TimeCreate': timezone.now()})
 
     context = {'title': "Добавление тезисов конференций",
                'type': 'thesis',
@@ -256,14 +261,16 @@ def monograph(request):
             url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/monograph"
             send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
                             url,
-                            form.cleaned_data["IdDeparture"])
+                            form.cleaned_data["IdDeparture"],
+                            request.user.last_name,
+                            )
             return redirect('profile')
         else:
             error = f'Произошла ошибка. Данные по монографии не отправлены. {form.errors}'
             messages.error(request, error)
             logger.error(form.cleaned_data)
     else:
-        form = MonographForm()
+        form = MonographForm(initial={'Author': request.user, 'TimeCreate': timezone.now()})
 
     context = {'title': "Добавление монографии",
                'type': 'monograph',
@@ -308,6 +315,7 @@ def edit(request, publication_id, type):
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} внесла изменения',
                                 request.build_absolute_uri(),
                                 form.cleaned_data["IdDeparture"],
+                                request.user.last_name,
                                 new=False)
 
             return redirect(request.META.get('HTTP_REFERER', '/'))
@@ -325,6 +333,8 @@ def edit(request, publication_id, type):
                 # Для отображения названия кафедры:
                 if key == 'IdDeparture_id':
                     initial['IdDeparture'] = value
+                elif key == 'Author_id':
+                    initial['Author'] = value
         logger.debug(f'Начальные данные: {initial}')
 
         if type == 'vak':

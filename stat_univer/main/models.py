@@ -1,5 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
 from .utils import *
+from django.utils import timezone
 
 
 class Institute(models.Model):
@@ -256,6 +258,9 @@ class Publication(models.Model):
         on_delete=models.PROTECT,
         help_text='Выберите название кафедры.'
     )
+
+    Author = models.ForeignKey(User, on_delete=models.CASCADE)
+    TimeCreate = models.DateTimeField(default=timezone.now())
 
 
 class VAK(Publication):
