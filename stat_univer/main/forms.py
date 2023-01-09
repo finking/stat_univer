@@ -205,8 +205,7 @@ class VAKForm(ModelForm):
             'Url': URLInput(attrs={
                 'class': 'form-control',
                 'id': 'Url',
-                'placeholder': 'https://',
-                # 'required': False
+                'placeholder': 'https://elibrary.ru/',
             }),
             'Accepted': CheckboxInput(attrs={
                 'class': 'form-check-input',
