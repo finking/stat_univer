@@ -23,11 +23,11 @@
         <table class="table">
               <thead>
                 <tr class="bw d-flex">
-                  <th scope="col" class="col-5">Название</th>
-                  <th scope="col" class="col-1">Принято</th>
+                  <th scope="col" class="col-5 text-center">Название</th>
+                  <th scope="col" class="col-1 text-center">Зачет</th>
 
-                  <th scope="col" class="col-1">Баллы</th>
-                  <th scope="col" class="col-5">Комментарии отдела статистики </th>
+                  <th scope="col" class="col-1 text-center">Баллы</th>
+                  <th scope="col" class="col-5 text-center">Комментарии отдела статистики </th>
 
                 </tr>
                 </thead>
@@ -40,20 +40,20 @@
                       <td class="col-5">
                         {{ publication.Name }}
                       </td>
-                      <td class="col-1"> Да </td>
+                      <td class="col-1 text-center"> Да </td>
                     {% else %}
                       <td class="col-5">
                         <a href="{% url 'edit' publication_id=publication.id type=type%}" target="_blank"> {{ publication.Name }} </a>
                       </td>
-                      <td class="col-1"> Нет </td>
+                      <td class="col-1 text-center"> Нет </td>
                     {% endif%}
-                  <td class="col-1">{{ publication.Points }}</td>
+                  <td class="col-1 text-center">{{ publication.Points }}</td>
                   <td class="col-5">{{ publication.Comment }}</td>
                 </tr>
             {% endfor%}
              </tbody>
         </table>
-        <a href="{% url 'report' institute_id=depart.IdInstitute.id %}"> Назад к просмотру к общему План-факту Кафедры </a>
+        <a href="{% url 'report' institute_id=depart.IdInstitute.id %}"> Назад к просмотру План-факта Института </a>
     </div>
 </div>
 </div>

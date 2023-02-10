@@ -1,5 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
 from .utils import *
+from django.utils import timezone
 
 
 class Institute(models.Model):
@@ -257,6 +259,8 @@ class Publication(models.Model):
         help_text='Выберите название кафедры.'
     )
 
+    Author = models.ForeignKey(User, on_delete=models.CASCADE)
+    TimeCreate = models.DateTimeField(default=timezone.now)
 
 class VAK(Publication):
     class Meta:
@@ -271,10 +275,7 @@ class VAK(Publication):
                            blank=True,
                            null=True)
     Output = models.CharField('Название журнала', max_length=250)
-    Url = models.URLField('Ссылка на Ринц или публикацию в журнале',
-                          help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
-                          blank=True,
-                          null=True)
+    Url = models.URLField('Ссылка на Ринц')
 
 
 class Thesis(Publication):

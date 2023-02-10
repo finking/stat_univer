@@ -229,8 +229,10 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 # File with secret info
-stat_univer/stat_univer/.env
-stat_univer/main/.env
+*.env
 
 # Dir with migrations
 stat_univer/main/migrations
+
+# The file with questions
+questions.md

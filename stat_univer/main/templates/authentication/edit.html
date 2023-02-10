@@ -19,7 +19,7 @@
     {% endif%}
 
       <div class="col-12">
-        <h4 class="mb-3 text-primary ">{{ title }}</h4>
+
         {% if perms.main.change_vak %}
             <p>Поля выделенные <b>жирным </b> являются обязательными.</p>
             <form action="{% url 'edit' publication_id=id type=type %}" method="post">
@@ -30,7 +30,10 @@
 
                             <div class="col-sm-12">
                             {% if f.field.required %}
+                                {% if f.id_for_label == "Author" or f.id_for_label == "TimeCreate" %}
+                                {% else %}
                                 <label for="{{ f.id_for_label }}" class="form-label fw-bold">{{ f.label }}</label>
+                                {% endif %}
                             {% else %}
                                 <label for="{{ f.id_for_label }}" class="form-label">{{ f.label }}</label>
                             {% endif %}
