@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from . import views
 
 urlpatterns = [
@@ -16,6 +16,8 @@ urlpatterns = [
     path('export_pf/<int:institute_id>', views.export_pf, name='export_pf'),
     path('login_user', views.login_user, name='login'),
     path('logout_user', views.logout_user, name='logout'),
+    path('change-password/', views.PassChangeView.as_view(), name='change-password'),
+    path('change-password/done/', views.PassChangeDoneView.as_view(), name='password_change_done'),
     path('profile', views.profile, name='profile'),
     path('vak', views.vak, name='vak'),
     path('edit/<int:publication_id>/<str:type>', views.edit, name='edit'),

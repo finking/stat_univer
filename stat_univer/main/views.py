@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from django.db.models import Sum
 from django.shortcuts import render, redirect
 from .models import Institute, Conference, Employee, FAQ, VAK, Thesis, Departure, Monograph
@@ -755,3 +756,13 @@ def write_headers(worksheet, header_format):
             worksheet.write(row_num, col_num, cell_value, header_format)
         col_start += 1
         col_finish += 1
+        
+        
+class PassChangeView(PasswordChangeView):
+    template_name = 'authentication/password_change.html'
+    extra_context = {'title': 'Смена пароля'}
+    
+
+class PassChangeDoneView(PasswordChangeDoneView):
+    template_name = 'authentication/password_change_done.html'
+    extra_context = {'message': 'Вы изменили пароль!'}
