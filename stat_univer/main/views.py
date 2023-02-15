@@ -207,7 +207,7 @@ def vak(request):
             messages.error(request, error)
             logger.error(form.cleaned_data)
     else:
-        form = VAKForm(initial={'Author': request.user, 'TimeCreate': timezone.now()})
+        form = VAKForm(initial={'Author': request.user})
     
     context = {'title': "Добавление статьи ВАК",
                'type': 'vak',
@@ -241,7 +241,7 @@ def thesis(request):
             messages.error(request, error)
             logger.error(form.cleaned_data)
     else:
-        form = ThesisForm(initial={'Author': request.user, 'TimeCreate': timezone.now()})
+        form = ThesisForm(initial={'Author': request.user})
 
     context = {'title': "Добавление тезисов конференций",
                'type': 'thesis',
@@ -271,7 +271,7 @@ def monograph(request):
             messages.error(request, error)
             logger.error(form.cleaned_data)
     else:
-        form = MonographForm(initial={'Author': request.user, 'TimeCreate': timezone.now()})
+        form = MonographForm(initial={'Author': request.user})
 
     context = {'title': "Добавление монографии",
                'type': 'monograph',

@@ -260,7 +260,9 @@ class Publication(models.Model):
     )
 
     Author = models.ForeignKey(User, on_delete=models.CASCADE)
-    TimeCreate = models.DateTimeField(default=timezone.now)
+    DateCreated = models.DateTimeField(auto_now_add=True)
+    DateUpdated = models.DateTimeField(auto_now=True)
+    
 
 class VAK(Publication):
     class Meta:

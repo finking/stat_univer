@@ -158,7 +158,7 @@ class VAKForm(ModelForm):
     class Meta:
         model = VAK
         fields = ['Name', 'Output', 'Tom', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author', 'TimeCreate']  # Порядок отображения полей
+                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author']  # Порядок отображения полей
 
         widgets = {
             'IdDeparture': Select(attrs={
@@ -227,11 +227,6 @@ class VAKForm(ModelForm):
                 'id': 'Author',
                 'hidden': True
             }),
-            'TimeCreate': DateTimeInput(attrs={
-                'class': 'form-control',
-                'id': 'TimeCreate',
-                'hidden': True
-            })
         }
 
 
@@ -240,7 +235,7 @@ class ThesisForm(ModelForm):
     class Meta:
         model = Thesis
         fields = ['Type','Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author', 'TimeCreate']
+                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author']
 
         widgets = {
             'IdDeparture': Select(attrs={
@@ -308,11 +303,6 @@ class ThesisForm(ModelForm):
                 'id': 'Author',
                 'hidden': True
             }),
-            'TimeCreate': DateTimeInput(attrs={
-                'class': 'form-control',
-                'id': 'TimeCreate',
-                'hidden': True
-            })
         }
 
 
@@ -321,7 +311,7 @@ class MonographForm(ModelForm):
     class Meta:
         model = Monograph
         fields = ['Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author', 'TimeCreate']
+                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author']
 
         widgets = {
             'IdDeparture': Select(attrs={
@@ -384,9 +374,4 @@ class MonographForm(ModelForm):
                 'id': 'Author',
                 'hidden': True
             }),
-            'TimeCreate': DateTimeInput(attrs={
-                'class': 'form-control',
-                'id': 'TimeCreate',
-                'hidden': True
-            })
         }
