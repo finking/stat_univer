@@ -1,0 +1,76 @@
+{% extends 'main/base.html'  %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+
+<div class="col-md-12">
+    <h1 class="text-center alert alert-primary">{{ title }}</h1>
+    {% if messages%}
+        {% for message in messages%}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor%}
+    {% endif%}
+
+
+     {% if object_list %}
+      <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Название статьи</th>
+              <th scope="col">Кафедра</th>
+              <th scope="col">Дата внесения</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for item in object_list %}
+            <tr>
+                {% if  item.Url and model != 'monograph' %}
+                    <td><a href="{{ item.Url }}" target="_blank">{{ item.Name }}</a></td>
+                {% else %}
+                    <td> {{ item.Name }} </td>
+                {% endif %}
+              <td> {{ item.IdDeparture}} </td>
+              <td>{{ item.DateCreated }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+    </table>
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; Первая</a> |
+                <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a> |
+            {% endif %}
+
+            <span class="current">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                 | <a href="?page={{ page_obj.next_page_number }}">Следующая</a> |
+                <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+      {% else %}
+        <p>Пока нет записей</p>
+      {% endif %}
+    <hr>
+    {% if user.is_staff %}
+    <a href="{% url 'export_publications' model=model %}">Скачать список</a>
+
+    {% endif %}
+    <br>
+    <a href="{% url 'index' %}">Назад на главную страницу сайта</a>
+
+    </div>
+</div>
+{% endblock %}

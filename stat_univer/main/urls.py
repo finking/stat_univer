@@ -3,6 +3,9 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('vakList', views.VakListView.as_view(), name='vakList'),
+    path('thesisList', views.ThesisListView.as_view(), name='thesisList'),
+    path('monographList', views.MonographListView.as_view(), name='monographList'),
     path('bd/', views.vvod, name="vvod"),
     path('institute', views.institute, name='institute'),
     path('department', views.department, name='department'),
@@ -14,6 +17,7 @@ urlpatterns = [
     path('export', views.export, name='export'),
     path('export_pf_all', views.export_pf_all, name='export_pf_all'),
     path('export_pf/<int:institute_id>', views.export_pf, name='export_pf'),
+    path('export_publications/<str:model>', views.export_publications_csv, name='export_publications'),
     path('login_user', views.login_user, name='login'),
     path('logout_user', views.logout_user, name='logout'),
     path('change-password/', views.PassChangeView.as_view(), name='change-password'),

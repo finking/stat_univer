@@ -13,6 +13,8 @@ import io
 import logging
 from .utils import dict_from_tuple, binary, MONTH, STATUS, COUNTRY, DepartureTemplate, send_mail_staff
 from django.contrib.auth import authenticate, login, logout
+from django.views.generic import ListView
+import csv
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +26,49 @@ BASE_FORMAT_PARAMS = {
     'font_name': 'Times New Roman',
     'font_size': 12,
 }
+
+
+class VakListView(ListView):
+   
+    model = VAK
+    paginate_by = 50
+    
+    def get_template_names(self):
+        return 'main/publication_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Список статей ВАК'
+        context['model'] = 'vak'
+        return context
+
+
+class ThesisListView(ListView):
+    model = Thesis
+    paginate_by = 50
+    
+    def get_template_names(self):
+        return 'main/publication_list.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Список тезисов конференций'
+        context['model'] = 'thesis'
+        return context
+
+
+class MonographListView(ListView):
+    model = Monograph
+    paginate_by = 50
+    
+    def get_template_names(self):
+        return 'main/publication_list.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Список монографий'
+        context['model'] = 'monograph'
+        return context
 
 
 def index(request):
@@ -766,8 +811,69 @@ def write_headers(worksheet, header_format):
             worksheet.write(row_num, col_num, cell_value, header_format)
         col_start += 1
         col_finish += 1
+
+
+# Экспорт публикаций в csv-формат
+# https://docs.djangoproject.com/en/4.1/howto/outputting-csv/
+def export_publications_csv(request, model):
+    
+    # Базовые поля, используемые в файле csv
+    base_fields = ['Name', 'Output', 'Year', 'Pages', 'DepartmentSame', 'DepartmentOther', 'Url', 'IdDeparture__Name',
+                   'Accepted', 'Points', 'Comment']
+    
+    # Для тезисов добавляется поле с Типом (Международная/Национальная)
+    thesis_fields = base_fields.copy()
+    thesis_fields.append('Type')
+
+    # Заголовки для файла с ВАК
+    base_list_name = ['Название публикации', 'Название журнала', 'Год', 'Страницы', 'Авторы c отчетной кафедры',
+                      'Авторы с других кафедр', 'Ссылка', 'Кафедра', 'Принято', 'Кол-во баллов', 'Комментарий']
+    
+    # Заголовки и поля для файла с тезисами
+    # Добавление столбца с Типом конференции и изменение одного из существующих
+    thesis_list_name = base_list_name.copy()
+    thesis_list_name.append('Тип конференции')
+    thesis_list_name[1] = 'Название конференции'
+    
+    # Заголовки для файла с монографиями
+    # Изменения одного из существующих
+    monograph_list_name = base_list_name.copy()
+    monograph_list_name[0] = 'Название монографии'
+    monograph_list_name[1] = 'ISBN'
+    
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f"attachment; filename={datetime.now().strftime('%d-%m-%Y')}-list_{model}.csv"
+
+    writer = csv.writer(response, delimiter=';')
+
+    if model == 'vak':  # Для ВАК
+        writer.writerow(['Список публикаций ВАК'])
+    
+        writer.writerow(base_list_name)
+    
+        publications = VAK.objects.all().values_list(*base_fields)
+    elif model == 'thesis':  # Для тезисов
+        writer.writerow(['Список тезисов конференций'])
+
+        writer.writerow(thesis_list_name)
+
+        publications = Thesis.objects.all().values_list(*thesis_fields)
         
-        
+    elif model == 'monograph':  # Для монографий
+        writer.writerow(['Список монографий'])
+
+        writer.writerow(monograph_list_name)
+
+        publications = Monograph.objects.all().values_list(*base_fields)
+    else:
+        publications = []
+        logger.error(f'Отсутствует модель публикаций для экспорта в csv для модели {model}')
+
+    for publication in publications:
+        writer.writerow(publication)
+    return response
+
+    
 class PassChangeView(PasswordChangeView):
     template_name = 'authentication/password_change.html'
     extra_context = {'title': 'Смена пароля'}
