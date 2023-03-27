@@ -20,11 +20,12 @@
 
 
      {% if object_list %}
-      <table class="table table-hover">
+      <table class="table table-hover text-center">
           <thead>
             <tr>
               <th scope="col">Название статьи</th>
               <th scope="col">Кафедра</th>
+              <th scope="col">Принято</th>
               <th scope="col">Дата внесения</th>
             </tr>
           </thead>
@@ -37,6 +38,11 @@
                     <td> {{ item.Name }} </td>
                 {% endif %}
               <td> {{ item.IdDeparture}} </td>
+                {% if item.Accepted %}
+                    <td> Да </td>
+                {% else %}
+                    <td> Нет </td>
+                {% endif %}
               <td>{{ item.DateCreated }}</td>
             </tr>
           {% endfor %}

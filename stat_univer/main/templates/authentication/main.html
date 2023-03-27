@@ -19,7 +19,7 @@
     {% endif%}
 
     <div class="col-12">
-        <table class="table">
+        <table class="table text-center">
               <thead>
                 <tr class="bw">
                   <th scope="col">Институт/Показатель</th>
@@ -31,7 +31,7 @@
              <tbody>
             {% for institute in total_list %}
                 <tr class="table-primary">
-                    <td colspan="4">
+                    <td colspan="4" class="fs-4">
                         <a href="{% url 'report' institute_id=institute.id %}"> {{ institute.name }} </a>
                     </td>
                 </tr>
@@ -41,7 +41,7 @@
                     <td style="padding-left: 25px;"> {{value.name}} </td>
                     <td>{{ value.plan}}</td>
                     <td>{{ value.fact }} </td>
-                    <td>{{ value.proc }} </td>
+                    <td>{{ value.proc }} %</td>
                     </tr>
 
                 {% endfor %}

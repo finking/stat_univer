@@ -41,6 +41,9 @@ class VakListView(ListView):
         context['title'] = 'Список статей ВАК'
         context['model'] = 'vak'
         return context
+    
+    def get_ordering(self):
+        return '-DateCreated'
 
 
 class ThesisListView(ListView):
@@ -56,6 +59,9 @@ class ThesisListView(ListView):
         context['model'] = 'thesis'
         return context
 
+    def get_ordering(self):
+        return '-DateCreated'
+
 
 class MonographListView(ListView):
     model = Monograph
@@ -70,6 +76,9 @@ class MonographListView(ListView):
         context['model'] = 'monograph'
         return context
 
+    def get_ordering(self):
+        return '-DateCreated'
+    
 
 def index(request):
     logger.info('Загрузка главной страницы. Шаблон: index.html')
