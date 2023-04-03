@@ -223,22 +223,17 @@ class Publication(models.Model):
     
     Name = models.CharField('Название публикации', max_length=250)
     Output = models.CharField('Полное название конференции', max_length=250)
-    Year = models.IntegerField('Год',
-                               blank=True,
-                               null=True)
+    Year = models.IntegerField('Год')
     Pages = models.CharField('Страницы', max_length=50,
                                 blank=True,
                                 null=True)
-    DepartmentSame = models.CharField('Авторы ГУУ с отчетной кафедры',
-                                      max_length=250,
-                                      blank=True,
-                                      null=True)
+    DepartmentSame = models.CharField('Авторы ГУУ с отчетной кафедры', max_length=250)
     DepartmentOther = models.CharField('Авторы с других кафедр ГУУ',
                                        max_length=250,
                                        blank=True,
                                        null=True)
 
-    Url = models.URLField('Ссылка на Ринц или сборник конференции',
+    Url = models.URLField('Ссылка на Ринц или сборник конференции', max_length=500,
                           help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
                           blank=True,
                           null=True)
