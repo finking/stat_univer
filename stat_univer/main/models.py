@@ -254,8 +254,8 @@ class Publication(models.Model):
         help_text='Выберите название кафедры.'
     )
 
-    Author = models.ForeignKey(User, on_delete=models.CASCADE)
-    DateCreated = models.DateTimeField(auto_now_add=True)
+    Author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    DateCreated = models.DateTimeField(auto_now_add=True, verbose_name='Дата внесения')
     DateUpdated = models.DateTimeField(auto_now=True)
     
 
