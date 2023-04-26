@@ -827,16 +827,16 @@ def write_headers(worksheet, header_format):
 def export_publications_csv(request, model):
     
     # Базовые поля, используемые в файле csv
-    base_fields = ['Name', 'Output', 'Year', 'Pages', 'DepartmentSame', 'DepartmentOther', 'Url', 'IdDeparture__Name',
-                   'Accepted', 'Points', 'Comment']
+    base_fields = ['id', 'Name', 'Output', 'Year', 'Pages', 'DepartmentSame', 'DepartmentOther', 'Url',
+                   'IdDeparture__Name', 'Accepted', 'Points', 'Comment', 'DateCreated']
     
     # Для тезисов добавляется поле с Типом (Международная/Национальная)
     thesis_fields = base_fields.copy()
     thesis_fields.append('Type')
 
     # Заголовки для файла с ВАК
-    base_list_name = ['Название публикации', 'Название журнала', 'Год', 'Страницы', 'Авторы c отчетной кафедры',
-                      'Авторы с других кафедр', 'Ссылка', 'Кафедра', 'Принято', 'Кол-во баллов', 'Комментарий']
+    base_list_name = ['№', 'Название публикации', 'Название журнала', 'Год', 'Страницы', 'Авторы c отчетной кафедры',
+                      'Авторы с других кафедр', 'Ссылка', 'Кафедра', 'Принято', 'Кол-во баллов', 'Комментарий', 'Дата внесения']
     
     # Заголовки и поля для файла с тезисами
     # Добавление столбца с Типом конференции и изменение одного из существующих
