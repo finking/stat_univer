@@ -40,7 +40,9 @@
 
                             {% if user.is_staff %}
                                 {% if f.html_name == "Url" %}
-                                    &nbsp;&nbsp;<a href="{{f.value}}" target="_blank">{{f.value}}</a>
+                                    {% if f.value %}
+                                        &nbsp;&nbsp;<a href="{{f.value}}" target="_blank">{{f.value}}</a>
+                                    {% endif %}
                                 {% endif %}
                                 {{ f }}
                             {% else %}
