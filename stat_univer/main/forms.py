@@ -165,10 +165,11 @@ class VAKForm(ModelForm):
                 'class': 'form-select',
                 'id': 'IdDeparture',
             }),
-            'Name': TextInput(attrs={
+            'Name': Textarea(attrs={
                 'class': 'form-control ',
                 'id': 'Name',
-                'placeholder': 'Введите название публикации'
+                'placeholder': 'Введите название публикации',
+                'rows': 5
             }),
             'Output': TextInput(attrs={
                 'class': 'form-control',
@@ -195,12 +196,14 @@ class VAKForm(ModelForm):
             'DepartmentSame': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'DepartmentSame',
-                'placeholder': '(по возможности с указанием кафедры)'
+                'placeholder': '(по возможности с указанием кафедры)',
+                'rows': 5
             }),
             'DepartmentOther': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'DepartmentOther',
-                'placeholder': '(по возможности с указанием кафедры)'
+                'placeholder': '(по возможности с указанием кафедры)',
+                'rows': 5
             }),
             'Url': URLInput(attrs={
                 'class': 'form-control',
@@ -220,7 +223,8 @@ class VAKForm(ModelForm):
             'Comment': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'Comment',
-                'required': False
+                'required': False,
+                'rows': 5
             }),
             'Author': Select(attrs={
                 'class': 'form-select',
@@ -246,10 +250,11 @@ class ThesisForm(ModelForm):
                 'class': 'form-select',
                 'id': 'Type',
             }),
-            'Name': TextInput(attrs={
+            'Name': Textarea(attrs={
                 'class': 'form-control ',
                 'id': 'Name',
-                'placeholder': 'Введите название публикации'
+                'placeholder': 'Введите название публикации',
+                'rows': 5
             }),
             'Output': TextInput(attrs={
                 'class': 'form-control',
@@ -270,12 +275,14 @@ class ThesisForm(ModelForm):
             'DepartmentSame': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'DepartmentSame',
-                'placeholder': '(по возможности с указанием кафедры)'
+                'placeholder': '(по возможности с указанием кафедры)',
+                'rows': 5
             }),
             'DepartmentOther': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'DepartmentOther',
-                'placeholder': '(по возможности с указанием кафедры)'
+                'placeholder': '(по возможности с указанием кафедры)',
+                'rows': 5
             }),
             'Url': URLInput(attrs={
                 'class': 'form-control',
@@ -296,7 +303,8 @@ class ThesisForm(ModelForm):
             'Comment': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'Comment',
-                'required': False
+                'required': False,
+                'rows': 5
             }),
             'Author': Select(attrs={
                 'class': 'form-select',
@@ -318,10 +326,11 @@ class MonographForm(ModelForm):
                 'class': 'form-select',
                 'id': 'IdDeparture',
             }),
-            'Name': TextInput(attrs={
+            'Name': Textarea(attrs={
                 'class': 'form-control ',
                 'id': 'Name',
-                'placeholder': 'Введите название монографии'
+                'placeholder': 'Введите название монографии',
+                'rows': 5
             }),
             'Output': TextInput(attrs={
                 'class': 'form-control',
@@ -342,12 +351,14 @@ class MonographForm(ModelForm):
             'DepartmentSame': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'DepartmentSame',
-                'placeholder': '(по возможности с указанием кафедры)'
+                'placeholder': '(по возможности с указанием кафедры)',
+                'rows': 5
             }),
             'DepartmentOther': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'DepartmentOther',
-                'placeholder': '(по возможности с указанием кафедры)'
+                'placeholder': '(по возможности с указанием кафедры)',
+                'rows': 5
             }),
             'Url': URLInput(attrs={
                 'class': 'form-control',
@@ -367,7 +378,8 @@ class MonographForm(ModelForm):
             'Comment': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'Comment',
-                'required': False
+                'required': False,
+                'rows': 5
             }),
             'Author': Select(attrs={
                 'class': 'form-select',
