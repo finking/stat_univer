@@ -6,12 +6,14 @@
 
 {% block content %}
 <div class="col-md-8 offset-md-3">
-    <h1 class="text-center alert alert-primary col-md-8">Ввод данных в базу данных</h1>
+    <h1 class="text-center alert alert-primary col-md-8">Формы для заполнения</h1>
     <div class="col-md-12">
-        <p>В данном подразделе указаны ссылки для добавления новой информации.</p>
+        <p>В данном разделе указаны ссылки для добавления новой информации.</p>
         <ul class="icon-list">
           <li><a href="{% url 'conference' %} ">Добавить конференцию</a></li>
-          <li class="text-muted">Добавить статью (в разработке).</li>
+          <li><a href="{% url 'vak' %} ">Добавить статью ВАК</a></li>
+          <li><a href="{% url 'thesis' %} ">Добавить тезисы конференций</a></li>
+          <li><a href="{% url 'monograph' %} ">Добавить монографию</a></li>
         </ul>
     </div>
 </div>
