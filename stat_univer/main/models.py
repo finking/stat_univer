@@ -123,11 +123,11 @@ class Departure(models.Model):
     PlanthesisNation = models.IntegerField('Тезисы в Нац. конференциях. План', default=0)
     PlanMonograph = models.IntegerField('Монографии. План', default=0)
     
-    PlanIncome = models.IntegerField('Плановый объем дохода, тыс.руб.', default=0)
-    FactIncome = models.IntegerField('Фактический объем дохода, тыс.руб.', default=0)
+    PlanIncome = models.FloatField('Плановый объем дохода, руб.', default=0)
+    FactIncome = models.FloatField('Фактический объем дохода, руб.', default=0)
     
-    PlanRID = models.IntegerField('РИД. План', default=0)
-    FactRID = models.IntegerField('РИД. Факт', default=0)
+    PlanRID = models.FloatField('РИД. План', default=0)
+    FactRID = models.FloatField('РИД. Факт', default=0)
 
     class Meta:
         verbose_name = "Кафедру"

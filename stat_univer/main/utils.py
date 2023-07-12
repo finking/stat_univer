@@ -30,7 +30,7 @@ def send_mail_staff(subject, url, department, username, new=True):
     """
     if new:
         message = f'Пользователь {username} добавил публикацию в раздел: {department}. ' \
-                  f'Список всех публикаций данного типа: {url}.'
+                  f'Список всех публикаций данного типа: {url}'
     else:
         message = f'{department} внесла изменения: {url}'
         
