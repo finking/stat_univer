@@ -244,27 +244,34 @@ def profile(request):
 def vak(request):
     logger.info('Загрузка страницы добавления ВАК.')
 
-    if request.method == 'POST':
-        form = VAKForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Публикация добавлена!')
-            url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/vak"
-            send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
-                            url,
-                            form.cleaned_data["IdDeparture"],
-                            request.user.last_name,
-                            )
-            return redirect('profile')
-        else:
-            error = f'Произошла ошибка. Данные публикации не отправлены.{form.errors}'
-            messages.error(request, error)
-            logger.error(form.cleaned_data)
+    # http://pythondjangorestapi.com/mastering-permissions-in-django-a-comprehensive-guide-to-secure-your-web-applications/
+    deny = False
+    if not request.user.has_perm('main.add_vak'):
+        deny = True
+        form = None
     else:
-        form = VAKForm(initial={'Author': request.user})
-    
+        if request.method == 'POST':
+            form = VAKForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Публикация добавлена!')
+                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/vak"
+                send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
+                                url,
+                                form.cleaned_data["IdDeparture"],
+                                request.user.last_name,
+                                )
+                return redirect('profile')
+            else:
+                error = f'Произошла ошибка. Данные публикации не отправлены.{form.errors}'
+                messages.error(request, error)
+                logger.error(form.cleaned_data)
+        else:
+            form = VAKForm(initial={'Author': request.user})
+        
     context = {'title': "Добавление статьи ВАК",
                'type': 'vak',
+               'deny': deny,
                'form': form}
     logger.debug(context)
     return render(request, 'authentication/publication.html', context)
@@ -274,31 +281,37 @@ def vak(request):
 def thesis(request):
     logger.info('Загрузка страницы добавления тезисов международных конференций.')
 
-    if request.method == 'POST':
-        form = ThesisForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Публикация добавлена!')
-            form_type = 'thesisNation'
-            if form.cleaned_data['Type'] == 'M':
-                form_type = 'thesisWorld'
-                
-            url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/{form_type}"
-            send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
-                            url,
-                            form.cleaned_data["IdDeparture"],
-                            request.user.last_name,
-                            )
-            return redirect('profile')
-        else:
-            error = f'Произошла ошибка. Данные публикации не отправлены.{form.errors}'
-            messages.error(request, error)
-            logger.error(form.cleaned_data)
+    deny = False
+    if not request.user.has_perm('main.add_vak'):
+        deny = True
+        form = None
     else:
-        form = ThesisForm(initial={'Author': request.user})
+        if request.method == 'POST':
+            form = ThesisForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Публикация добавлена!')
+                form_type = 'thesisNation'
+                if form.cleaned_data['Type'] == 'M':
+                    form_type = 'thesisWorld'
+                    
+                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/{form_type}"
+                send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
+                                url,
+                                form.cleaned_data["IdDeparture"],
+                                request.user.last_name,
+                                )
+                return redirect('profile')
+            else:
+                error = f'Произошла ошибка. Данные публикации не отправлены.{form.errors}'
+                messages.error(request, error)
+                logger.error(form.cleaned_data)
+        else:
+            form = ThesisForm(initial={'Author': request.user})
 
     context = {'title': "Добавление тезисов конференций",
                'type': 'thesis',
+               'deny': deny,
                'form': form}
     logger.debug(context)
     return render(request, 'authentication/publication.html', context)
@@ -308,27 +321,34 @@ def thesis(request):
 def monograph(request):
     logger.info('Загрузка страницы добавления монографий.')
 
-    if request.method == 'POST':
-        form = MonographForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Монография добавлена!')
-            url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/monograph"
-            send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
-                            url,
-                            form.cleaned_data["IdDeparture"],
-                            request.user.last_name,
-                            )
-            return redirect('profile')
-        else:
-            error = f'Произошла ошибка. Данные по монографии не отправлены. {form.errors}'
-            messages.error(request, error)
-            logger.error(form.cleaned_data)
+    deny = False
+    if not request.user.has_perm('main.add_vak'):
+        deny = True
+        form = None
     else:
-        form = MonographForm(initial={'Author': request.user})
 
+        if request.method == 'POST':
+            form = MonographForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Монография добавлена!')
+                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/monograph"
+                send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
+                                url,
+                                form.cleaned_data["IdDeparture"],
+                                request.user.last_name,
+                                )
+                return redirect('profile')
+            else:
+                error = f'Произошла ошибка. Данные по монографии не отправлены. {form.errors}'
+                messages.error(request, error)
+                logger.error(form.cleaned_data)
+        else:
+            form = MonographForm(initial={'Author': request.user})
+        
     context = {'title': "Добавление монографии",
                'type': 'monograph',
+               'deny': deny,
                'form': form}
     logger.debug(context)
     return render(request, 'authentication/publication.html', context)
