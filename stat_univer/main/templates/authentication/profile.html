@@ -28,7 +28,7 @@
         </h2>
         <ul class="icon-list">
           <li>
-              <a href=" {% url 'main' %} ">План-факт</a>
+              <a href=" {% url 'main' year=year%} ">План-факт</a>
           </li>
           <li><a href="{% url 'history' %}" >Конференции</a></li>
           <li><a href="{% url 'vakList' %}">Публикации ВАК</a></li>
@@ -54,6 +54,12 @@
           </li>
           <li>
               <a href="{% url 'monograph' %}" > Монография </a>
+          </li>
+          <li>
+              <a href="{% url 'income' %}" > Доход по НИР </a>
+          </li>
+          <li>
+              <a href="{% url 'rid' %}" > РИД </a>
           </li>
 
         </ul>

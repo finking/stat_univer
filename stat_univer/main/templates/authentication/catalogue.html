@@ -8,7 +8,7 @@
 <div class="row">
 {% include 'authentication/menu.html' %}
 <div class="col-md-8">
-    <h1 class="text-center alert alert-primary">{{ title }}</h1>
+    <h1 class="text-center alert alert-primary">{{ title }} в {{ year }} году</h1>
     {% if messages %}
         {% for message in messages%}
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -43,7 +43,7 @@
                       <td class="col-1 text-center"> Да </td>
                     {% else %}
                       <td class="col-5">
-                        <a href="{% url 'edit' publication_id=publication.id type=type%}" target="_blank"> {{ publication.Name }} </a>
+                        <a href="{% url 'edit' publication_id=publication.id type=type %}" target="_blank"> {{ publication.Name }} </a>
                       </td>
                       <td class="col-1 text-center"> Нет </td>
                     {% endif%}
@@ -53,7 +53,7 @@
             {% endfor%}
              </tbody>
         </table>
-        <a href="{% url 'report' institute_id=depart.IdInstitute.id %}"> Назад к просмотру План-факта Института </a>
+        <a href="{% url 'report' institute_id=depart.IdInstitute.id year=year %}"> Назад к просмотру План-факта Института </a>
     </div>
 </div>
 </div>

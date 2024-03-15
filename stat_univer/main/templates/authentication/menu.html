@@ -11,6 +11,12 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href=" {% url 'main' year=2024 %} " class="nav-link link-dark">
+              Просмотр план-факта
+            </a>
+          </li>
+            <hr>
+          <li class="nav-item">
             <a href="{% url 'vak' %}" class="nav-link link-dark" aria-current="page">
              Добавление ВАК
             </a>
@@ -26,8 +32,13 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href=" {% url 'main' %} " class="nav-link link-dark">
-              Просмотр план-факта
+            <a href="{% url 'income' %}" class="nav-link link-dark" aria-current="page">
+             Добавление дохода по НИР
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'rid' %}" class="nav-link link-dark" aria-current="page">
+             Добавление РИД
             </a>
           </li>
         </ul>

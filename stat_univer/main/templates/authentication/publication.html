@@ -34,7 +34,7 @@
 
             <p>Поля, выделенные <b>жирным</b>, являются обязательными.</p>
 
-            <form action="{% url type %}" method="post">
+            <form action="{% url type %}" method="post" enctype="multipart/form-data">
 
               {% csrf_token %}
               <div class="row g-3">

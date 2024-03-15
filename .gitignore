@@ -236,3 +236,6 @@ stat_univer/main/migrations
 
 # The file with questions
 questions.md
+
+# Dir with media downloaded
+media/

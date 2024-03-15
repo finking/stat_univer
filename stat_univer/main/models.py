@@ -305,3 +305,75 @@ class Monograph(Publication):
                           help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
                           blank=True,
                           null=True)
+
+
+class Income(models.Model):
+    class Meta:
+        verbose_name = "Доход"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.Name
+
+    IdDeparture = models.ForeignKey(
+        'Departure',
+        verbose_name='Кафедра',
+        on_delete=models.CASCADE,
+        help_text='Выберите название кафедры.',
+        default='-'
+    )
+    
+    Name = models.CharField('Наименование НИР (работы, услуги)', max_length=500)
+    Year = models.IntegerField('Год')
+    Value = models.FloatField('Сумма НИР', default=0,  help_text='Укажите сумму договора')
+    Points = models.FloatField('Зачтенная сумма НИР', default=0, blank=True)
+    Accepted = models.BooleanField('Принято: ', default=False)
+    Comment = models.TextField('Комментарий отдела статистики: ',
+                               blank=True,
+                               null=True)
+    Author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    DateCreated = models.DateTimeField(auto_now_add=True, verbose_name='Дата внесения')
+    DateUpdated = models.DateTimeField(auto_now=True)
+
+
+class RID(models.Model):
+    class Meta:
+        verbose_name = "РИД"
+        verbose_name_plural = "РИДы"
+
+    def __str__(self):
+        return self.Name
+    
+    IdDeparture = models.ForeignKey(
+        'Departure',
+        verbose_name='Кафедра',
+        on_delete=models.CASCADE,
+        help_text='Выберите название кафедры.',
+        default='-'
+    )
+    
+    Name = models.CharField('Наименование РИД', max_length=500)
+    Year = models.IntegerField('Год')
+    Doc = models.FileField(verbose_name='Свидетельство', upload_to='docs', default=None, blank=True, null=True,
+                           max_length=300)
+    Points = models.FloatField('Значение', default=0, blank=True)
+    Accepted = models.BooleanField('Принято: ', default=False)
+    Comment = models.TextField('Комментарий отдела статистики: ',
+                               blank=True,
+                               null=True)
+    Author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    DateCreated = models.DateTimeField(auto_now_add=True, verbose_name='Дата внесения')
+    DateUpdated = models.DateTimeField(auto_now=True)
+    
+
+class Plan(models.Model):
+    class Meta:
+        verbose_name = "Плановые показатели"
+        verbose_name_plural = verbose_name
+
+    Departure = models.ForeignKey('Departure', verbose_name='Кафедра', on_delete=models.CASCADE, default='-')
+    Name = models.CharField('Показатель', choices=PARAMETERNAME, max_length=10)
+    Year = models.IntegerField('Год')
+    Value = models.FloatField('Значение (в шт) или Сумма (в руб.)', default=0)
+    DateCreated = models.DateTimeField(auto_now_add=True, verbose_name='Дата внесения')
+    DateUpdated = models.DateTimeField(auto_now=True)

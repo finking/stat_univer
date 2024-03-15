@@ -1,6 +1,6 @@
-from .models import Conference, Institute, FAQ, VAK, Thesis, Monograph
+from .models import Conference, Institute, FAQ, VAK, Thesis, Monograph, Income, RID
 from django.forms import ModelForm, TextInput, Select, URLInput, EmailInput, Textarea, NumberInput, \
-    CheckboxInput, Form, EmailField, DateTimeInput
+    CheckboxInput, Form, EmailField, FileInput
 
 
 class ConferenceForm(ModelForm):
@@ -370,6 +370,112 @@ class MonographForm(ModelForm):
                 'id': 'Accepted',
                 'required': False
             }),
+            'Points': NumberInput(attrs={
+                'class': 'form-control',
+                'id': 'Points',
+                'required': False
+            }),
+            'Comment': Textarea(attrs={
+                'class': 'form-control',
+                'id': 'Comment',
+                'required': False,
+                'rows': 5
+            }),
+            'Author': Select(attrs={
+                'class': 'form-select',
+                'id': 'Author',
+                'hidden': True
+            }),
+        }
+        
+
+class IncomeForm(ModelForm):
+
+    class Meta:
+        model = Income
+        fields = ['IdDeparture', 'Name', 'Year', 'Accepted', 'Value', 'Points', 'Comment', 'Author']
+
+        widgets = {
+            'IdDeparture': Select(attrs={
+                'class': 'form-select',
+                'id': 'IdDeparture',
+            }),
+            'Name': Textarea(attrs={
+                'class': 'form-control ',
+                'id': 'Name',
+                'placeholder': 'Введите наименование НИР (работы, услуги)',
+                'rows': 5
+            }),
+            'Year': NumberInput(attrs={
+                'class': 'form-control',
+                'id': 'Year',
+                'placeholder': 'Введите год, например: 2024',
+            }),
+            
+            'Accepted': CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'id': 'Accepted',
+                'required': False
+            }),
+    
+            'Value': NumberInput(attrs={
+                'class': 'form-control',
+                'id': 'Value',
+                'required': False
+            }),
+            
+            'Points': NumberInput(attrs={
+                'class': 'form-control',
+                'id': 'Points',
+                'required': False
+            }),
+            'Comment': Textarea(attrs={
+                'class': 'form-control',
+                'id': 'Comment',
+                'required': False,
+                'rows': 5
+            }),
+            'Author': Select(attrs={
+                'class': 'form-select',
+                'id': 'Author',
+                'hidden': True
+            }),
+        }
+
+
+class RidForm(ModelForm):
+    class Meta:
+        model = RID
+        fields = ['IdDeparture', 'Name', 'Year', 'Doc', 'Accepted', 'Points', 'Comment', 'Author']
+        
+        widgets = {
+            'IdDeparture': Select(attrs={
+                'class': 'form-select',
+                'id': 'IdDeparture',
+            }),
+            'Name': Textarea(attrs={
+                'class': 'form-control ',
+                'id': 'Name',
+                'placeholder': 'Введите наименование РИД',
+                'rows': 5
+            }),
+            'Year': NumberInput(attrs={
+                'class': 'form-control',
+                'id': 'Year',
+                'placeholder': 'Введите год, например: 2024',
+            }),
+            
+            'Doc': FileInput(attrs={
+                'class': 'form-control',
+                'id': 'Doc',
+            }),
+            
+            'Accepted': CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'id': 'Accepted',
+                'required': False
+            }),
+            
             'Points': NumberInput(attrs={
                 'class': 'form-control',
                 'id': 'Points',

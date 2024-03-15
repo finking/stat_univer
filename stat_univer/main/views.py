@@ -4,14 +4,14 @@ from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.utils import timezone
-from .models import Institute, Conference, Employee, FAQ, VAK, Thesis, Departure, Monograph
-from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm, MonographForm
+from .models import Institute, Conference, Employee, FAQ, VAK, Thesis, Departure, Monograph, Income, RID, Plan
+from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm, MonographForm, IncomeForm, RidForm
 from django.http import HttpResponse
 from datetime import datetime
 from xlsxwriter.workbook import Workbook
 import io
 import logging
-from .utils import dict_from_tuple, binary, MONTH, STATUS, COUNTRY, DepartureTemplate, send_mail_staff
+from .utils import dict_from_tuple, binary, MONTH, STATUS, COUNTRY, PARAMETERNAME, DepartureTemplate, send_mail_staff
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic import ListView
 import csv
@@ -26,6 +26,12 @@ BASE_FORMAT_PARAMS = {
     'font_name': 'Times New Roman',
     'font_size': 12,
 }
+
+# Год по-умолчанию
+Year_default = 2024  # Примечание: в файле menu.html жестко зафиксирован год по умолчанию в стр.39
+
+# Названия показателей
+_, Vak_name, Thes_M_name, Thes_N_name, Mono_name, Income_name, Rid_name = PARAMETERNAME
 
 
 class VakListView(ListView):
@@ -235,7 +241,8 @@ def logout_user(request):
 def profile(request):
     logger.info('Загрузка страницы профиля.')
     
-    context = {'title': "Профиль"}
+    context = {'title': "Профиль",
+               'year': Year_default}
 
     return render(request, 'authentication/profile.html', context)
 
@@ -255,7 +262,7 @@ def vak(request):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Публикация добавлена!')
-                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/vak"
+                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/vak/{Year_default}"
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
                                 url,
                                 form.cleaned_data["IdDeparture"],
@@ -295,7 +302,7 @@ def thesis(request):
                 if form.cleaned_data['Type'] == 'M':
                     form_type = 'thesisWorld'
                     
-                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/{form_type}"
+                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/{form_type}/{Year_default}"
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
                                 url,
                                 form.cleaned_data["IdDeparture"],
@@ -332,7 +339,7 @@ def monograph(request):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Монография добавлена!')
-                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/monograph"
+                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/monograph/{Year_default}"
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
                                 url,
                                 form.cleaned_data["IdDeparture"],
@@ -355,8 +362,84 @@ def monograph(request):
 
 
 @login_required
+def income(request):
+    logger.info('Загрузка страницы добавления дохода')
+    
+    deny = False
+    if not request.user.has_perm('main.add_income'):
+        deny = True
+        form = None
+    else:
+        
+        if request.method == 'POST':
+            form = IncomeForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Доход по НИР добавлен!')
+                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/income/{Year_default}"
+                send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавил доход.',
+                                url,
+                                form.cleaned_data["IdDeparture"],
+                                request.user.last_name,
+                                )
+                return redirect('profile')
+            else:
+                error = f'Произошла ошибка. Данные по доходу не отправлены. {form.errors}'
+                messages.error(request, error)
+                logger.error(form.cleaned_data)
+        else:
+            form = IncomeForm(initial={'Author': request.user})
+    
+    context = {'title': "Добавление дохода по НИР",
+               'type': 'income',
+               'deny': deny,
+               'form': form,
+               'year': Year_default}
+    logger.debug(context)
+    return render(request, 'authentication/publication.html', context)
+
+
+@login_required
+def rid(request):
+    logger.info('Загрузка страницы добавления РИД')
+    
+    deny = False
+    if not request.user.has_perm('main.add_rid'):
+        deny = True
+        form = None
+    else:
+        
+        if request.method == 'POST':
+            form = RidForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Доход по НИР добавлен!')
+                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/rid/{Year_default}"
+                send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавил РИД.',
+                                url,
+                                form.cleaned_data["IdDeparture"],
+                                request.user.last_name,
+                                )
+                return redirect('profile')
+            else:
+                error = f'Произошла ошибка. Данные по РИД не отправлены. {form.errors}'
+                messages.error(request, error)
+                logger.error(form.cleaned_data)
+        else:
+            form = RidForm(initial={'Author': request.user})
+    
+    context = {'title': "Добавление РИД",
+               'type': 'rid',
+               'deny': deny,
+               'form': form,
+               'year': Year_default}
+    logger.debug(context)
+    return render(request, 'authentication/publication.html', context)
+
+
+@login_required
 def edit(request, publication_id, type):
-    logger.info('Загрузка страницы редактирования публикации')
+    logger.info('Загрузка страницы редактирования записи')
     error = ''
     title = ''
 
@@ -372,6 +455,12 @@ def edit(request, publication_id, type):
     elif type == 'monograph':
         title = 'Редактирование монографии'
         _queryset = Monograph.objects.get(pk=publication_id)
+    elif type == 'income':
+        title = 'Редактирование НИР'
+        _queryset = Income.objects.get(pk=publication_id)
+    elif type == 'rid':
+        title = 'Редактирование РИД'
+        _queryset = RID.objects.get(pk=publication_id)
         
     if request.method == 'POST':
         if type == 'vak':
@@ -380,10 +469,14 @@ def edit(request, publication_id, type):
             form = ThesisForm(request.POST, instance=_queryset)
         elif type == 'monograph':
             form = MonographForm(request.POST, instance=_queryset)
+        elif type == 'income':
+            form = IncomeForm(request.POST, instance=_queryset)
+        elif type == 'rid':
+            form = RidForm(request.POST, request.FILES, instance=_queryset)
             
         if form.is_valid():
             form.save()
-            messages.success(request, 'Публикация отредактирована! Можете закрыть данную вкладку.')
+            messages.success(request, 'Запись отредактирована! Можете закрыть данную вкладку.')
             
             # Отправка письма только, если редактировал не админ.
             if not request.user.is_staff:
@@ -395,13 +488,13 @@ def edit(request, publication_id, type):
 
             return redirect(request.META.get('HTTP_REFERER', '/'))
         else:
-            error = 'Произошла ошибка. Данные публикации не отправлены.'
+            error = 'Произошла ошибка. Запись не изменена.'
             logger.error(form.cleaned_data)
     else:
         # Словарь для заполнения формы
         initial = {}
 
-        logger.debug(f'Загрузка публикации ВАК: {_queryset}')
+        logger.debug(f'Загрузка записи: {_queryset}')
         for key, value in _queryset.__dict__.items():
             if value:
                 initial[key] = value
@@ -418,6 +511,10 @@ def edit(request, publication_id, type):
             form = ThesisForm(initial=initial)
         elif type == 'monograph':
             form = MonographForm(initial=initial)
+        elif type == 'income':
+            form = IncomeForm(initial=initial)
+        elif type == 'rid':
+            form = RidForm(initial=initial)
     
     context = {'title': title,
                'type': type,
@@ -430,45 +527,40 @@ def edit(request, publication_id, type):
 
 # Отчет по институтам
 @login_required(redirect_field_name='login_user')
-def main(request):
-    total_list = get_info_institute()
+def main(request, year=Year_default):
+    total_list = get_info_institute(year)
 
     context = {'title': "План-факт по науке",
-               'total_list': total_list}
+               'total_list': total_list,
+               'year': year}
     logger.debug(context)
     return render(request, 'authentication/main.html', context)
 
 
-def get_info_institute():
+@login_required(redirect_field_name='login_user')
+def old(request, year):
+    total_list = get_info_institute(year)
+
+    context = {'title': "План-факт по науке",
+               'total_list': total_list,
+               'year': year}
+    logger.debug(context)
+    return render(request, 'authentication/main.html', context)
+
+
+def get_info_institute(year):
     institutes = Institute.objects.all()
-    vaks = VAK.objects.filter(Accepted=True).values('IdDeparture__IdInstitute__Name').annotate(sum=Sum('Points'))
-    # https://docs.djangoproject.com/en/4.0/topics/db/aggregation/#following-relationships-backwards
-    planVak = Institute.objects.annotate(total=Sum('departure__PlanVak'))
-    thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).values('IdDeparture__IdInstitute__Name').annotate(
-        sum=Sum('Points'))
-    planthesisWorld = Institute.objects.annotate(total=Sum('departure__PlanthesisWorld'))
-    thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).values('IdDeparture__IdInstitute__Name').annotate(
-        sum=Sum('Points'))
-    planthesisNation = Institute.objects.annotate(total=Sum('departure__PlanthesisNation'))
-    monograph = Monograph.objects.filter(Accepted=True).values('IdDeparture__IdInstitute__Name').annotate(
-        sum=Sum('Points'))
-    planMonograph = Institute.objects.annotate(total=Sum('departure__PlanMonograph'))
-    planIncome = Institute.objects.annotate(total=Sum('departure__PlanIncome'))
-    factIncome = Institute.objects.annotate(total=Sum('departure__FactIncome'))
-    planRID = Institute.objects.annotate(total=Sum('departure__PlanRID'))
-    factRID = Institute.objects.annotate(total=Sum('departure__FactRID'))
-    logger.debug(f'Vaks: {vaks}, тезисы в междун. конф: {thesisWorld}, тезисы в нац.конф: {thesisNation}')
+
     total_list = []  # Список для хранения списка Институтов
     for institute in institutes:
         # Преобразование информации по публикациям для отображения на сайте
-        vak = get_publication('Количество публикаций в журналах ВАК', institute, planVak, vaks)
-        tw = get_publication('Количество тезисов в международных конференциях', institute, planthesisWorld, thesisWorld)
-        tn = get_publication('Количество тезисов в национальных конференциях', institute, planthesisNation,
-                             thesisNation)
-        mo = get_publication('Количество монографий', institute, planMonograph, monograph)
+        vak = get_publication(Vak_name, institute.id, year)
+        tw = get_publication(Thes_M_name, institute.id, year)
+        tn = get_publication(Thes_N_name, institute.id, year)
+        mo = get_publication(Mono_name, institute.id, year)
         
-        income = get_data('Общий доход, руб.', institute, planIncome, factIncome)
-        rid = get_data('РИД', institute, planRID, factRID)
+        income = get_publication(Income_name, institute.id, year)
+        rid = get_publication(Rid_name, institute.id, year)
         
         values = {
             'vak': vak,
@@ -485,25 +577,32 @@ def get_info_institute():
     return total_list
 
 
-# Функция для преобразования информации по публикациям
-def get_publication(name, subdivision, planType, publicationType, type=0):
+def get_publication(name, id, year, type=True):
+    '''
+    Функция для преобразования информации по публикациям
     
-    plan = get_plan(planType, subdivision, type)
+    :param name: tuple, Название показателя ('ВАК', 'Количество публикаций в журналах ВАК')
+    :param id: ID Института или кафедры
+    :param year: Год отчета
+    :param type: Флаг для определния типа подразделения. Если True, то Институт. Если False - кафедра
 
-    # Фактический показатель
-    fact = 0
-    for publication in publicationType:
-        if isinstance(subdivision, Institute):
-            if publication['IdDeparture__IdInstitute__Name'] == f'{subdivision}':
-                fact = publication['sum']
-        elif isinstance(subdivision, dict): # TODO Разобраться почему Институты приходят как модель, а кафедры как словарь
-            if publication['IdDeparture__Name'] == subdivision['Name']:
-                fact = publication['sum']
+    
+    :return: dict,
+        data = {
+            'name': name[1], # Название показателя хранится во втором элементе tuple
+            'plan': plan,
+            'fact': fact,
+            'proc': proc,
+        }
+    '''
+
+    plan = get_plan(name[0], id, year, type)
+    fact = get_fact(name[0], id, year, type)
 
     proc = get_proc(fact, plan)
 
     data = {
-        'name': name, # Название показателя
+        'name': name[1],
         'plan': plan,
         'fact': fact,
         'proc': proc,
@@ -513,40 +612,32 @@ def get_publication(name, subdivision, planType, publicationType, type=0):
 
 # Отчет по кафедрам для каждого института
 @login_required
-def report(request, institute_id):
+def report(request, institute_id, year):
 
-    total_list = get_info_departure(institute_id)
+    total_list = get_info_departure(institute_id, year)
 
     context = {'title': "План-факт по науке",
                'total_list': total_list,
-               'institute_id': institute_id}
+               'institute_id': institute_id,
+               'year': Year_default}
     logger.debug(context)
     return render(request, 'authentication/report.html', context)
 
 
-def get_info_departure(institute_id):
+def get_info_departure(institute_id, year):
     # Получение данных из соответствующих таблиц
-    departures = Departure.objects.filter(IdInstitute=institute_id).values(
-        'id', 'Name', 'PlanVak', 'PlanthesisWorld', 'PlanthesisNation', 'PlanIncome', 'FactIncome', 'PlanRID',
-        'FactRID', 'PlanMonograph')
-    vaks = VAK.objects.filter(IdDeparture__IdInstitute=institute_id).filter(Accepted=True).values('IdDeparture__Name')\
-        .annotate(sum=Sum('Points'))
-    thesisWorld = Thesis.objects.filter(Type='M').filter(Accepted=True).filter(IdDeparture__IdInstitute=institute_id)\
-        .values('IdDeparture__Name').annotate(sum=Sum('Points'))
-    thesisNation = Thesis.objects.filter(Type='N').filter(Accepted=True).filter(IdDeparture__IdInstitute=institute_id)\
-        .values('IdDeparture__Name').annotate(sum=Sum('Points'))
-    monograph = Monograph.objects.filter(IdDeparture__IdInstitute=institute_id).filter(Accepted=True).values(
-        'IdDeparture__Name').annotate(sum=Sum('Points'))
+    departures = Departure.objects.filter(IdInstitute=institute_id).values('id', 'Name')
+
     # Добавление в список кафедр необходимых параметров.
     total_list = []
     for departure in departures:
         # Преобразование информации по публикациям для отображения на сайте
-        vak = get_publication('Количество публикаций в журналах ВАК', departure, False, vaks, 1)
-        tw = get_publication('Количество тезисов в международных конференциях', departure, False, thesisWorld, 2)
-        tn = get_publication('Количество тезисов в национальных конференциях', departure, False, thesisNation, 3)
-        mo = get_publication('Количество монографий', departure, False, monograph, 4)
-        income = get_data('Общий доход, руб.', departure, False, False, 1)
-        rid = get_data('РИД', departure, False, False, 2)
+        vak = get_publication(Vak_name, departure['id'], year, type=False)
+        tw = get_publication(Thes_M_name, departure['id'], year, type=False)
+        tn = get_publication(Thes_N_name, departure['id'], year, type=False)
+        mo = get_publication(Mono_name, departure['id'], year, type=False)
+        income = get_publication(Income_name, departure['id'], year, type=False)
+        rid = get_publication(Rid_name, departure['id'], year, type=False)
         
         values = {
             'vak': vak,
@@ -563,24 +654,32 @@ def get_info_departure(institute_id):
 
 
 @login_required
-def catalogue(request, department_id, type):
+def catalogue(request, department_id, type, year):
     title = "Список публикаций"
     publications = {}
     if type == 'vak':
         title = 'Список статей ВАК'
-        publications = VAK.objects.filter(IdDeparture=department_id).values(
+        publications = VAK.objects.filter(IdDeparture=department_id, Year=year).values(
             'id', 'Name', 'Accepted', 'Points', 'Comment')
     elif type == 'thesisWorld':
         title = 'Список тезисов международных конференций'
-        publications = Thesis.objects.filter(IdDeparture=department_id).filter(Type='M').values(
+        publications = Thesis.objects.filter(IdDeparture=department_id, Type='M', Year=year).values(
             'id', 'Name', 'Accepted', 'Points', 'Comment', 'Type')
     elif type == 'thesisNation':
         title = 'Список тезисов национальных конференций'
-        publications = Thesis.objects.filter(IdDeparture=department_id).filter(Type='N').values(
+        publications = Thesis.objects.filter(IdDeparture=department_id, Type='N', Year=year).values(
             'id', 'Name', 'Accepted', 'Points', 'Comment', 'Type')
     elif type == 'monograph':
         title = 'Список монографий'
-        publications = Monograph.objects.filter(IdDeparture=department_id).values(
+        publications = Monograph.objects.filter(IdDeparture=department_id, Year=year).values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment')
+    elif type == 'income':
+        title = 'Список НИР'
+        publications = Income.objects.filter(IdDeparture=department_id, Year=year).values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment')
+    elif type == 'rid':
+        title = 'Список РИД'
+        publications = RID.objects.filter(IdDeparture=department_id, Year=year).values(
             'id', 'Name', 'Accepted', 'Points', 'Comment')
         
     depart = Departure.objects.get(pk=department_id)
@@ -588,38 +687,10 @@ def catalogue(request, department_id, type):
     context = {'title': title,
                'publications': publications,
                'depart': depart,
-               'type': type}
+               'type': type,
+               'year': year}
     logger.debug(context)
     return render(request, 'authentication/catalogue.html', context)
-
-
-# Функция для преобразования информации по Доходу и РИДам
-def get_data(name, subdivision, planType, factType, type=0):
-    plan = 0
-    fact = 0
-    
-    # Для кафедр planType равен False
-    if planType:
-        plan = get_plan(planType, subdivision, type)
-        fact = get_plan(factType, subdivision, type)
-    else:
-        if type == 1:
-            plan = subdivision['PlanIncome']
-            fact = subdivision['FactIncome']
-        elif type == 2:
-            plan = subdivision['PlanRID']
-            fact = subdivision['FactRID']
-    
-    proc = get_proc(fact, plan)
-    
-    data = {
-        'name': name,  # Название показателя
-        'plan': f'{plan:_}'.replace('_', ' '),  # https://miguendes.me/73-examples-to-help-you-master-pythons-f-strings#heading-how-to-format-a-number-with-spaces-as-decimal-separator
-        'fact': f'{fact:_}'.replace('_', ' '),
-        'proc': proc,
-    }
-    
-    return data
 
 
 # Расчет процента выполнения плана
@@ -631,27 +702,79 @@ def get_proc(fact, plan):
     return proc
 
 
-# Расчет плановых показателей (а также факта для Дохода и Ридов)
-def get_plan(planType, subdivision, type):
-    # Плановый показатель
-    plan = 0
-    # planType есть только для институтов. Для кафедр считать иначе.
-    if planType:
-        for pt in planType:
-            if pt == subdivision:
-                plan = pt.total
-    else:
-        # Цифры от 1 до 3 означают Плна по статьям ВАК, Тезисам в междунар. или нац. конференциях соотвественно.
-        if type == 1:
-            plan = subdivision['PlanVak']
-        elif type == 2:
-            plan = subdivision['PlanthesisWorld']
-        elif type == 3:
-            plan = subdivision['PlanthesisNation']
-        elif type == 4:
-            plan = subdivision['PlanMonograph']
-    return plan
+def get_plan(name: str, id: int, year: int, type: bool) -> float:
+    '''
+    Функция для получения планового показателя для кафедры или Института
+    
+    :param name: Названиение показателя (Значения: 'ВАК', 'ТЕЗИСЫ_М', 'ТЕЗИСЫ_Н', 'МОНОГРАФИЯ', 'ДОХОД', 'РИД')
+    :param id: ID института или кафедры
+    :param year: Год показателя
+    :param type: Флаг для определния типа подразделения. Если True, то Институт. Если False - кафедра
+    :return: Значение показателя
+    '''
 
+
+    if type:
+        v = Plan.objects.filter(Departure__IdInstitute=id, Name=name, Year=year).aggregate(Sum("Value", default=0))
+        if v:
+            return v['Value__sum']
+        else: # Если пустой Queryset
+            return 0.0
+    
+    else:
+        v = Plan.objects.filter(Departure=id, Name=name, Year=year)
+        if v: # Если пустой Queryset
+            return v[0].Value
+        else:
+            return 0.0
+
+
+def get_fact(name: str, id: int, year: int, type: bool) -> float:
+    '''
+    
+    :param name: Название показателя (Значения: 'ВАК', 'ТЕЗИСЫ_М', 'ТЕЗИСЫ_Н', 'МОНОГРАФИЯ', 'ДОХОД', 'РИД')
+    :param id: ID института или кафедры
+    :param year: Год показателя
+    :param type: Флаг для определния типа подразделения. Если True, то Институт. Если False - кафедра
+    :return: Значение показателя
+    '''
+
+    if type:
+
+        if name == "ВАК":
+            res = VAK.objects.filter(Accepted=True, IdDeparture__IdInstitute=id, Year=year)
+        elif name == "ТЕЗИСЫ_М":
+            res = Thesis.objects.filter(Accepted=True, IdDeparture__IdInstitute=id, Type='M', Year=year)
+        elif name == "ТЕЗИСЫ_Н":
+            res = Thesis.objects.filter(Accepted=True, IdDeparture__IdInstitute=id, Type='N', Year=year)
+        elif name == "МОНОГРАФИЯ":
+            res = Monograph.objects.filter(Accepted=True, IdDeparture__IdInstitute=id, Year=year)
+        elif name == 'ДОХОД':
+            res = Income.objects.filter(Accepted=True, IdDeparture__IdInstitute=id, Year=year)
+        elif name == 'РИД':
+            res = RID.objects.filter(Accepted=True, IdDeparture__IdInstitute=id, Year=year)
+            
+    else:
+        if name == "ВАК":
+            res = VAK.objects.filter(Accepted=True, IdDeparture=id, Year=year)
+        elif name == "ТЕЗИСЫ_М":
+            res = Thesis.objects.filter(Accepted=True, IdDeparture=id, Type='M', Year=year)
+        elif name == "ТЕЗИСЫ_Н":
+            res = Thesis.objects.filter(Accepted=True, IdDeparture=id, Type='N', Year=year)
+        elif name == "МОНОГРАФИЯ":
+            res = Monograph.objects.filter(Accepted=True, IdDeparture=id, Year=year)
+        elif name == 'ДОХОД':
+            res = Income.objects.filter(Accepted=True, IdDeparture=id, Year=year)
+        elif name == 'РИД':
+            res = RID.objects.filter(Accepted=True, IdDeparture=id, Year=year)
+        
+    if res:
+        fact = res.aggregate(sum=Sum('Points'))['sum']
+    else:  # Если пустой Queryset
+        fact = 0.0
+        
+    return fact
+    
 
 def write_to_excel(conferences_queryset):
     # Определение заголовков.
@@ -739,14 +862,14 @@ def write_to_excel(conferences_queryset):
 
 
 @login_required
-def export_pf_all(request):
+def export_pf_all(request, year):
     logger.info('Экспорт План-факта Университета')
     
     objects_institutes = Institute.objects.all()
     
     dict_info = {}
     for ins in objects_institutes:
-        info = get_info_departure(ins.id)
+        info = get_info_departure(ins.id, year)
         dict_info[ins.Name] = info
 
     output = plan_fact_to_excel(dict_info)
@@ -761,13 +884,13 @@ def export_pf_all(request):
 
 
 @login_required
-def export_pf(request, institute_id):
+def export_pf(request, institute_id, year):
 
     ins = Institute.objects.get(id=institute_id)
     logger.info(f'Экспорт План-факта {ins}')
     
     dict_info = {}
-    info = get_info_departure(ins.id)
+    info = get_info_departure(ins.id, year=year)
     dict_info[ins.Name] = info
 
     output = plan_fact_to_excel(dict_info)
