@@ -11,34 +11,34 @@ class InstituteAdmin(admin.ModelAdmin):
 class VAKAdmin(admin.ModelAdmin):
     list_display = ('Name', 'IdDeparture', 'Author', 'DateCreated')
     list_display_links = ('Name', )
-    search_fields = ('Name', 'Author__username')
+    search_fields = ('Name', 'IdDeparture__Name', 'Author__username')
     
 
 class ThesisAdmin(admin.ModelAdmin):
     list_display = ('Name', 'IdDeparture', 'Author', 'DateCreated')
     list_display_links = ('Name', )
-    search_fields = ('Name', 'Author__username')
+    search_fields = ('Name', 'IdDeparture__Name', 'Author__username')
     
     
 class MonographAdmin(admin.ModelAdmin):
     list_display = ('Name', 'IdDeparture', 'Author', 'DateCreated')
     list_display_links = ('Name', )
-    search_fields = ('Name', 'Author__username')
+    search_fields = ('Name', 'IdDeparture__Name', 'Author__username')
 
 
 class PlanAdmin(admin.ModelAdmin):
     list_display = ('Departure', 'Name', 'Year', 'Value')
-    search_fields = ('Departure', 'Name')
+    search_fields = ('Departure__Name', 'Name')
 
 
 class IncomeAdmin(admin.ModelAdmin):
     list_display = ('Name', 'IdDeparture', 'Year', 'Points')
-    search_fields = ('Name', 'IdDeparture',)
+    search_fields = ('Name', 'IdDeparture__Name', )
 
     
 class RIDAdmin(admin.ModelAdmin):
     list_display = ('Name', 'IdDeparture', 'Year', 'Points')
-    search_fields = ('Name', 'IdDeparture',)
+    search_fields = ('Name', 'IdDeparture__Name', )
 
 
 admin.site.register(Institute, InstituteAdmin)
