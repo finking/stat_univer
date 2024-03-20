@@ -413,7 +413,7 @@ def rid(request):
             form = RidForm(request.POST, request.FILES)
             if form.is_valid():
                 form.save()
-                messages.success(request, 'Доход по НИР добавлен!')
+                messages.success(request, 'РИД добавлен!')
                 url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/rid/{Year_default}"
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавил РИД.',
                                 url,
@@ -619,7 +619,7 @@ def report(request, institute_id, year):
     context = {'title': "План-факт по науке",
                'total_list': total_list,
                'institute_id': institute_id,
-               'year': Year_default}
+               'year': year}
     logger.debug(context)
     return render(request, 'authentication/report.html', context)
 
