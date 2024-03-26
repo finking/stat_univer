@@ -20,12 +20,13 @@
 
 
      {% if object_list %}
-      <table class="table table-hover text-center">
-          <thead>
+      <table class="table table-hover text-center align-middle">
+          <thead class="table-light align-middle">
             <tr>
-              <th scope="col">Название статьи</th>
+              <th scope="col">Название</th>
               <th scope="col">Кафедра</th>
               <th scope="col">Принято</th>
+              <th scope="col">Комментарий</th>
               <th scope="col">Дата внесения</th>
             </tr>
           </thead>
@@ -43,6 +44,7 @@
                 {% else %}
                     <td> Нет </td>
                 {% endif %}
+              <td>{{ item.Comment }}</td>
               <td>{{ item.DateCreated }}</td>
             </tr>
           {% endfor %}
