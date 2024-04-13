@@ -659,28 +659,28 @@ def catalogue(request, department_id, type, year):
     publications = {}
     if type == 'vak':
         title = 'Список статей ВАК'
-        publications = VAK.objects.filter(IdDeparture=department_id, Year=year).values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment')
+        publications = VAK.objects.filter(IdDeparture=department_id).values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
     elif type == 'thesisWorld':
         title = 'Список тезисов международных конференций'
-        publications = Thesis.objects.filter(IdDeparture=department_id, Type='M', Year=year).values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment', 'Type')
+        publications = Thesis.objects.filter(IdDeparture=department_id, Type='M').values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
     elif type == 'thesisNation':
         title = 'Список тезисов национальных конференций'
-        publications = Thesis.objects.filter(IdDeparture=department_id, Type='N', Year=year).values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment', 'Type')
+        publications = Thesis.objects.filter(IdDeparture=department_id, Type='N').values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
     elif type == 'monograph':
         title = 'Список монографий'
-        publications = Monograph.objects.filter(IdDeparture=department_id, Year=year).values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment')
+        publications = Monograph.objects.filter(IdDeparture=department_id).values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
     elif type == 'income':
         title = 'Список НИР'
-        publications = Income.objects.filter(IdDeparture=department_id, Year=year).values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment')
+        publications = Income.objects.filter(IdDeparture=department_id).values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
     elif type == 'rid':
         title = 'Список РИД'
-        publications = RID.objects.filter(IdDeparture=department_id, Year=year).values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment')
+        publications = RID.objects.filter(IdDeparture=department_id).values(
+            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
         
     depart = Departure.objects.get(pk=department_id)
 
