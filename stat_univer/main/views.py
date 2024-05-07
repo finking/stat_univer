@@ -221,7 +221,10 @@ def login_user(request):
         if user is not None:
             login(request, user)
             logger.info(f'Вход на сайт пользователя {username}')
-            return redirect('profile')
+            if request.GET.get('next'):
+                return redirect(request.GET.get('next'))  # Redirect to Next after login
+            else:
+                return redirect('profile')
         else:
             messages.success(request, 'Произошла ошибка при авторизации... Просьба попробовать еще раз.')
             logger.warning(f"Неудачная попытка входа с логином: {username}")
