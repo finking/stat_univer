@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
+from django.core.paginator import Paginator
 from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.utils import timezone
@@ -686,9 +687,14 @@ def catalogue(request, department_id, type, year):
             'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
         
     depart = Departure.objects.get(pk=department_id)
+    
+    # Pagination #
+    paginator = Paginator(publications, 5)  # Show 10 publications per page.
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     context = {'title': title,
-               'publications': publications,
+               "page_obj": page_obj,
                'depart': depart,
                'type': type,
                'year': year}

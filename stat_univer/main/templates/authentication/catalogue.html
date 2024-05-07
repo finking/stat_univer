@@ -33,7 +33,7 @@
                 </thead>
              <tbody>
  <!-- https://stackoverflow.com/questions/25385289/how-to-set-the-size-of-a-column-in-a-bootstrap-responsive-table-->
-             {% for publication in publications %}
+             {% for publication in page_obj %}
                 <tr class="table-light d-flex">
 
                     {% if  publication.Accepted%}
@@ -51,8 +51,26 @@
                   <td class="col-5">{{ publication.Comment }}</td>
                 </tr>
             {% endfor%}
-             </tbody>
         </table>
+         <div class="text-center">
+            <span class="step-links" >
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; Первая</a> |
+                    <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a> |
+                {% endif %}
+
+                <span class="current">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }} |
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Следующая</a> |
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a> |
+                {% endif %}
+            </span>
+        </div>
+        <br>
+        </tbody>
         <a href="{% url 'report' institute_id=depart.IdInstitute.id year=year %}"> Назад к просмотру План-факта Института </a>
     </div>
 </div>
