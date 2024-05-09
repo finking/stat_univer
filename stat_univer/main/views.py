@@ -266,9 +266,14 @@ def vak(request):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Публикация добавлена!')
-                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/vak/{Year_default}"
+
+                logger.debug(f'ID vak: {form.instance.id}')  # ID публикации появляется только после form.save()
+                # www.reddit.com/r/djangolearning/comments/g9rwme/how_to_get_object_id_from_post_request/'
+
+                # Отправка сообщения проверяющим
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
-                                url,
+                                form.cleaned_data["Name"],
+                                f"{request.scheme}://{request.META['HTTP_HOST']}/edit/{form.instance.id}/vak",
                                 form.cleaned_data["IdDeparture"],
                                 request.user.last_name,
                                 )
@@ -305,10 +310,10 @@ def thesis(request):
                 form_type = 'thesisNation'
                 if form.cleaned_data['Type'] == 'M':
                     form_type = 'thesisWorld'
-                    
-                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/{form_type}/{Year_default}"
+
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
-                                url,
+                                form.cleaned_data["Name"],
+                                f"{request.scheme}://{request.META['HTTP_HOST']}/edit/{form.instance.id}/{form_type}",
                                 form.cleaned_data["IdDeparture"],
                                 request.user.last_name,
                                 )
@@ -343,9 +348,10 @@ def monograph(request):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Монография добавлена!')
-                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/monograph/{Year_default}"
+
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
-                                url,
+                                form.cleaned_data["Name"],
+                                f"{request.scheme}://{request.META['HTTP_HOST']}/edit/{form.instance.id}/monograph",
                                 form.cleaned_data["IdDeparture"],
                                 request.user.last_name,
                                 )
@@ -380,9 +386,10 @@ def income(request):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Доход по НИР добавлен!')
-                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/income/{Year_default}"
+
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавил доход.',
-                                url,
+                                form.cleaned_data["Name"],
+                                f"{request.scheme}://{request.META['HTTP_HOST']}/edit/{form.instance.id}/income",
                                 form.cleaned_data["IdDeparture"],
                                 request.user.last_name,
                                 )
@@ -418,9 +425,10 @@ def rid(request):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'РИД добавлен!')
-                url = f"{request.scheme}://{request.META['HTTP_HOST']}/catalogue/{request.POST['IdDeparture']}/rid/{Year_default}"
+
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавил РИД.',
-                                url,
+                                form.cleaned_data["Name"],
+                                f"{request.scheme}://{request.META['HTTP_HOST']}/edit/{form.instance.id}/rid",
                                 form.cleaned_data["IdDeparture"],
                                 request.user.last_name,
                                 )
@@ -485,6 +493,7 @@ def edit(request, publication_id, type):
             # Отправка письма только, если редактировал не админ.
             if not request.user.is_staff:
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} внесла изменения',
+                                form.cleaned_data["Name"],
                                 request.build_absolute_uri(),
                                 form.cleaned_data["IdDeparture"],
                                 request.user.last_name,
@@ -689,7 +698,7 @@ def catalogue(request, department_id, type, year):
     depart = Departure.objects.get(pk=department_id)
     
     # Pagination #
-    paginator = Paginator(publications, 5)  # Show 10 publications per page.
+    paginator = Paginator(publications, 10)  # Show 10 publications per page.
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
@@ -721,7 +730,6 @@ def get_plan(name: str, id: int, year: int, type: bool) -> float:
     :param type: Флаг для определния типа подразделения. Если True, то Институт. Если False - кафедра
     :return: Значение показателя
     '''
-
 
     if type:
         v = Plan.objects.filter(Departure__IdInstitute=id, Name=name, Year=year).aggregate(Sum("Value", default=0))

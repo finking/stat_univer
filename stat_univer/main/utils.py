@@ -20,19 +20,20 @@ class DepartureTemplate:
 
 
 # Отправка email-уведомления
-def send_mail_staff(subject, url, department, username, new=True):
+def send_mail_staff(subject, nameRecord, url, department, username, new=True):
     """
     :param subject: Тема письма
-    :param url: Ссылка публикацию (если она редактируется), либо на список публикаций (если добавлена новая)
+    :param nameRecord: Название записи (публикации, НИР или РИД)
+    :param url: Ссылка на запись
     :param department: Название кафедры
     :param username: Имя пользователя, который довабляет публикацию
     :param new: True - Новая публикация, иначе редактирование уже имеющейся
     """
     if new:
-        message = f'Пользователь {username} добавил публикацию в раздел: {department}. ' \
-                  f'Список всех публикаций данного типа: {url}'
+        message = f'Пользователь {username} добавил запись для: {department}. \r\n' \
+                  f'Название: {nameRecord}. \r\nСсылка: {url}'
     else:
-        message = f'{department} внесла изменения: {url}'
+        message = f'{department} внесла изменения в {nameRecord}: {url}'
         
     send_mail(
         subject,
