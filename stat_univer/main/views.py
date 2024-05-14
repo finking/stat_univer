@@ -307,13 +307,10 @@ def thesis(request):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Публикация добавлена!')
-                form_type = 'thesisNation'
-                if form.cleaned_data['Type'] == 'M':
-                    form_type = 'thesisWorld'
 
                 send_mail_staff(f'{form.cleaned_data["IdDeparture"]} добавила публикацию.',
                                 form.cleaned_data["Name"],
-                                f"{request.scheme}://{request.META['HTTP_HOST']}/edit/{form.instance.id}/{form_type}",
+                                f"{request.scheme}://{request.META['HTTP_HOST']}/edit/{form.instance.id}/thesis",
                                 form.cleaned_data["IdDeparture"],
                                 request.user.last_name,
                                 )
