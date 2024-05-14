@@ -286,7 +286,7 @@ def vak(request):
             form = VAKForm(initial={'Author': request.user})
         
     context = {'title': "Добавление статьи ВАК",
-               'type': 'vak',
+               'feature': 'vak',
                'deny': deny,
                'form': form}
     logger.debug(context)
@@ -326,7 +326,7 @@ def thesis(request):
             form = ThesisForm(initial={'Author': request.user})
 
     context = {'title': "Добавление тезисов конференций",
-               'type': 'thesis',
+               'feature': 'thesis',
                'deny': deny,
                'form': form}
     logger.debug(context)
@@ -364,7 +364,7 @@ def monograph(request):
             form = MonographForm(initial={'Author': request.user})
         
     context = {'title': "Добавление монографии",
-               'type': 'monograph',
+               'feature': 'monograph',
                'deny': deny,
                'form': form}
     logger.debug(context)
@@ -402,7 +402,7 @@ def income(request):
             form = IncomeForm(initial={'Author': request.user})
     
     context = {'title': "Добавление дохода по НИР",
-               'type': 'income',
+               'feature': 'income',
                'deny': deny,
                'form': form,
                'year': Year_default}
@@ -441,7 +441,7 @@ def rid(request):
             form = RidForm(initial={'Author': request.user})
     
     context = {'title': "Добавление РИД",
-               'type': 'rid',
+               'feature': 'rid',
                'deny': deny,
                'form': form,
                'year': Year_default}
@@ -450,40 +450,37 @@ def rid(request):
 
 
 @login_required
-def edit(request, publication_id, type):
+def edit(request, feature_id, feature):
     logger.info('Загрузка страницы редактирования записи')
     error = ''
     title = ''
 
-    if type == 'vak':
+    if feature == 'vak':
         title = "Редактирование статьи ВАК"
-        _queryset = VAK.objects.get(pk=publication_id)
-    elif type == 'thesisWorld':
-        title = 'Редактирование тезисов международных конференций'
-        _queryset = Thesis.objects.get(pk=publication_id)
-    elif type == 'thesisNation':
-        title = 'Редактирование тезисов национальных конференций'
-        _queryset = Thesis.objects.get(pk=publication_id)
-    elif type == 'monograph':
+        _queryset = VAK.objects.get(pk=feature_id)
+    elif feature == 'thesis':
+        title = 'Редактирование тезисов конференций'
+        _queryset = Thesis.objects.get(pk=feature_id)
+    elif feature == 'monograph':
         title = 'Редактирование монографии'
-        _queryset = Monograph.objects.get(pk=publication_id)
-    elif type == 'income':
+        _queryset = Monograph.objects.get(pk=feature_id)
+    elif feature == 'income':
         title = 'Редактирование НИР'
-        _queryset = Income.objects.get(pk=publication_id)
-    elif type == 'rid':
+        _queryset = Income.objects.get(pk=feature_id)
+    elif feature == 'rid':
         title = 'Редактирование РИД'
-        _queryset = RID.objects.get(pk=publication_id)
+        _queryset = RID.objects.get(pk=feature_id)
         
     if request.method == 'POST':
-        if type == 'vak':
+        if feature == 'vak':
             form = VAKForm(request.POST, instance=_queryset)
-        elif type == 'thesisWorld' or type == 'thesisNation':
+        elif feature == 'thesis':
             form = ThesisForm(request.POST, instance=_queryset)
-        elif type == 'monograph':
+        elif feature == 'monograph':
             form = MonographForm(request.POST, instance=_queryset)
-        elif type == 'income':
+        elif feature == 'income':
             form = IncomeForm(request.POST, instance=_queryset)
-        elif type == 'rid':
+        elif feature == 'rid':
             form = RidForm(request.POST, request.FILES, instance=_queryset)
             
         if form.is_valid():
@@ -518,22 +515,22 @@ def edit(request, publication_id, type):
                     initial['Author'] = value
         logger.debug(f'Начальные данные: {initial}')
 
-        if type == 'vak':
+        if feature == 'vak':
             form = VAKForm(initial=initial)
-        elif type == 'thesisWorld' or type == 'thesisNation':
+        elif feature == 'thesis':
             form = ThesisForm(initial=initial)
-        elif type == 'monograph':
+        elif feature == 'monograph':
             form = MonographForm(initial=initial)
-        elif type == 'income':
+        elif feature == 'income':
             form = IncomeForm(initial=initial)
-        elif type == 'rid':
+        elif feature == 'rid':
             form = RidForm(initial=initial)
     
     context = {'title': title,
-               'type': type,
+               'feature': feature,
                'form': form,
                'error': error,
-               'id': publication_id}
+               'id': feature_id}
     logger.debug(context)
     return render(request, 'authentication/edit.html', context)
 
@@ -567,13 +564,13 @@ def get_info_institute(year):
     total_list = []  # Список для хранения списка Институтов
     for institute in institutes:
         # Преобразование информации по публикациям для отображения на сайте
-        vak = get_publication(Vak_name, institute.id, year)
-        tw = get_publication(Thes_M_name, institute.id, year)
-        tn = get_publication(Thes_N_name, institute.id, year)
-        mo = get_publication(Mono_name, institute.id, year)
+        vak = get_features(Vak_name, institute.id, year)
+        tw = get_features(Thes_M_name, institute.id, year)
+        tn = get_features(Thes_N_name, institute.id, year)
+        mo = get_features(Mono_name, institute.id, year)
         
-        income = get_publication(Income_name, institute.id, year)
-        rid = get_publication(Rid_name, institute.id, year)
+        income = get_features(Income_name, institute.id, year)
+        rid = get_features(Rid_name, institute.id, year)
         
         values = {
             'vak': vak,
@@ -590,9 +587,9 @@ def get_info_institute(year):
     return total_list
 
 
-def get_publication(name, id, year, type=True):
+def get_features(name, id, year, type=True):
     '''
-    Функция для преобразования информации по публикациям
+    Функция для преобразования информации по показателям
     
     :param name: tuple, Название показателя ('ВАК', 'Количество публикаций в журналах ВАК')
     :param id: ID Института или кафедры
@@ -645,12 +642,12 @@ def get_info_departure(institute_id, year):
     total_list = []
     for departure in departures:
         # Преобразование информации по публикациям для отображения на сайте
-        vak = get_publication(Vak_name, departure['id'], year, type=False)
-        tw = get_publication(Thes_M_name, departure['id'], year, type=False)
-        tn = get_publication(Thes_N_name, departure['id'], year, type=False)
-        mo = get_publication(Mono_name, departure['id'], year, type=False)
-        income = get_publication(Income_name, departure['id'], year, type=False)
-        rid = get_publication(Rid_name, departure['id'], year, type=False)
+        vak = get_features(Vak_name, departure['id'], year, type=False)
+        tw = get_features(Thes_M_name, departure['id'], year, type=False)
+        tn = get_features(Thes_N_name, departure['id'], year, type=False)
+        mo = get_features(Mono_name, departure['id'], year, type=False)
+        income = get_features(Income_name, departure['id'], year, type=False)
+        rid = get_features(Rid_name, departure['id'], year, type=False)
         
         values = {
             'vak': vak,
@@ -667,45 +664,47 @@ def get_info_departure(institute_id, year):
 
 
 @login_required
-def catalogue(request, department_id, type, year):
+def catalogue(request, department_id, feature, year):
     title = "Список публикаций"
-    publications = {}
-    if type == 'vak':
+    items = {}
+    if feature == 'vak':
         title = 'Список статей ВАК'
-        publications = VAK.objects.filter(IdDeparture=department_id).values(
+        items = VAK.objects.filter(IdDeparture=department_id).values(
             'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
-    elif type == 'thesisWorld':
+    elif feature == 'thesisWorld':
         title = 'Список тезисов международных конференций'
-        publications = Thesis.objects.filter(IdDeparture=department_id, Type='M').values(
+        items = Thesis.objects.filter(IdDeparture=department_id, Type='M').values(
             'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
-    elif type == 'thesisNation':
+        feature = 'thesis'  # Переопределение для шаблона Edit
+    elif feature == 'thesisNation':
         title = 'Список тезисов национальных конференций'
-        publications = Thesis.objects.filter(IdDeparture=department_id, Type='N').values(
+        items = Thesis.objects.filter(IdDeparture=department_id, Type='N').values(
             'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
-    elif type == 'monograph':
+        feature = 'thesis'  # Переопределение для шаблона Edit
+    elif feature == 'monograph':
         title = 'Список монографий'
-        publications = Monograph.objects.filter(IdDeparture=department_id).values(
+        items = Monograph.objects.filter(IdDeparture=department_id).values(
             'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
-    elif type == 'income':
+    elif feature == 'income':
         title = 'Список НИР'
-        publications = Income.objects.filter(IdDeparture=department_id).values(
+        items = Income.objects.filter(IdDeparture=department_id).values(
             'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
-    elif type == 'rid':
+    elif feature == 'rid':
         title = 'Список РИД'
-        publications = RID.objects.filter(IdDeparture=department_id).values(
+        items = RID.objects.filter(IdDeparture=department_id).values(
             'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
         
     depart = Departure.objects.get(pk=department_id)
     
     # Pagination #
-    paginator = Paginator(publications, 10)  # Show 10 publications per page.
+    paginator = Paginator(items, 10)  # Show 10 items per page.
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     context = {'title': title,
                "page_obj": page_obj,
                'depart': depart,
-               'type': type,
+               'feature': feature,
                'year': year}
     logger.debug(context)
     return render(request, 'authentication/catalogue.html', context)

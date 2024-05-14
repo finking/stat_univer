@@ -43,7 +43,7 @@
                       <td class="col-1 text-center"> Да </td>
                     {% else %}
                       <td class="col-5">
-                        <a href="{% url 'edit' publication_id=publication.id type=type %}" target="_blank"> {{ publication.Name }} </a>
+                        <a href="{% url 'edit' feature_id=publication.id feature=feature %}" target="_blank"> {{ publication.Name }} </a>
                       </td>
                       <td class="col-1 text-center"> Нет </td>
                     {% endif%}

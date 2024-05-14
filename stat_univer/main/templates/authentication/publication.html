@@ -23,7 +23,7 @@
         {% endif%}
 
           <div class="col-12">
-            {% if type == 'thesis' %}
+            {% if feature == 'thesis' %}
               <p class="border border-danger p-2">
                   <b>ВАЖНО!!!</b>
                   Тезисы конференций учитываются только при условии внесении информации о мероприятии в базу данных.
@@ -34,7 +34,7 @@
 
             <p>Поля, выделенные <b>жирным</b>, являются обязательными.</p>
 
-            <form action="{% url type %}" method="post" enctype="multipart/form-data">
+            <form action="{% url feature %}" method="post" enctype="multipart/form-data">
 
               {% csrf_token %}
               <div class="row g-3">
