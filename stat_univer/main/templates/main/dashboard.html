@@ -1,0 +1,64 @@
+  {% extends 'main/base.html'  %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block content %}
+  <h1 class="text-center alert alert-primary">{{ title }}</h1>
+    <div class="row mt-3 pt-3">
+        <div class="col-md-4">
+            <div class="border p-3 shadow">
+                <h4>Изменить показатель</h4>
+                <hr>
+                <form method="POST">
+                    {% csrf_token %}
+                         {{ form.as_p }}
+                    <input class="w-100 btn btn-primary" type="submit" value="Изменить">
+                </form>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div>
+              <canvas id="myChart" >
+              </canvas>
+            </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+          const ctx = document.getElementById('myChart');
+
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: [
+              {% for k,v in total_list.items %}
+                '{{ k }}',
+              {% endfor %}
+              ],
+              datasets: [{
+                label: '% от плана ({{ feature}})',
+                data: [
+                  {% for k,v  in total_list.items %}
+                    {{ v | floatformat:"3u" }},
+                  {% endfor %}
+                ],
+                borderWidth: 1,
+                backgroundColor: '#b6d4fe'
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                    max: 100,
+                }
+              }
+            }
+          });
+        </script>
+
+        </div>
+    </div>
+{% endblock %}
+

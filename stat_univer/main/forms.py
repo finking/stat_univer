@@ -1,6 +1,7 @@
 from .models import Conference, Institute, FAQ, VAK, Thesis, Monograph, Income, RID
 from django.forms import ModelForm, TextInput, Select, URLInput, EmailInput, Textarea, NumberInput, \
-    CheckboxInput, Form, EmailField, FileInput
+    CheckboxInput, Form, EmailField, FileInput, ChoiceField
+from .utils import PARAMETERNAME
 
 
 class ConferenceForm(ModelForm):
@@ -91,6 +92,12 @@ class ConferenceForm(ModelForm):
 
 class HistoryForm(Form):
     email = EmailField()
+    
+    
+class DashboardForm(Form):
+    feature = ChoiceField(choices=PARAMETERNAME,
+                          label='Показатель',
+                          widget=Select(attrs={"style": "width: 100%"}))
 
 
 class InstituteForm(ModelForm):

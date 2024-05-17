@@ -32,4 +32,5 @@ urlpatterns = [
     path('rid', views.rid, name='rid'),
     path('report/<int:institute_id>/<int:year>', views.report, name='report'),
     path('catalogue/<int:department_id>/<str:feature>/<int:year>', views.catalogue, name='catalogue'),
+    path('dashboard/', views.dashboard, name='dashboard')
 ]

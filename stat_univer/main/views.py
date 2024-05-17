@@ -6,7 +6,7 @@ from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Institute, Conference, Employee, FAQ, VAK, Thesis, Departure, Monograph, Income, RID, Plan
-from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm, MonographForm, IncomeForm, RidForm
+from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm, MonographForm, IncomeForm, RidForm, DashboardForm
 from django.http import HttpResponse
 from datetime import datetime
 from xlsxwriter.workbook import Workbook
@@ -1037,6 +1037,43 @@ def export_publications_csv(request, model):
     for publication in publications:
         writer.writerow(publication)
     return response
+
+
+# Функция для отображения визуальной информации
+def dashboard(request):
+    
+    institutes = Institute.objects.all()
+    
+    if request.method == 'POST':
+        form = DashboardForm(request.POST)
+        if form.is_valid():
+            feature = form.cleaned_data['feature']  # Получение Показателя из формы.
+            dict_parameter = dict(PARAMETERNAME)  # Преобразование кортежа с параметрами в словарь
+            
+            # Элемент словаря - это кортеж, н-р ('ВАК', 'Количество публикаций в журналах ВАК')
+            for parameter in dict_parameter:
+                if feature in parameter:
+                    # Если Показаель есть в Ключе, то
+                    # присваиваем Name Ключ ('ВАК') и Значение ('Количество публикаций в журналах ВАК')
+                    name = (parameter, dict_parameter[parameter])
+
+    else:
+        form = DashboardForm()
+        name = ('ВАК', 'Количество публикаций в журналах ВАК')
+  
+    total_list = {}
+    
+    for institute in institutes:
+        data = get_features(name, institute.id, year=Year_default)
+        total_list[institute.ShortName] = data['proc']
+    
+    logger.debug(f'Вывод данных: {total_list}')
+    
+    context = {'title': "Выполнение плана за 2024 год",
+               'feature': name[1],
+               'form': form,
+               'total_list': total_list}
+    return render(request, 'main/dashboard.html', context)
 
     
 class PassChangeView(PasswordChangeView):
