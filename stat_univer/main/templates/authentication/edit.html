@@ -75,8 +75,12 @@
                     {% endfor %}
 
               </div>
-              <hr class="my-4">
-              <button class="w-100 btn btn-primary btn-lg" type="submit">Сохранить изменения</button>
+              {% if form.Accepted.value and user.is_staff is False%}
+                <p><b>Запись принята. Редактирование заблокировано!</b></p>
+              {% else %}
+                <hr class="my-4">
+                <button class="w-100 btn btn-primary btn-lg" type="submit">Сохранить изменения</button>
+              {% endif %}
             </form>
         {% else %}
           <p>У вас нет доступа к этому разделу. Обратитесь к администратору сайта.</p>
