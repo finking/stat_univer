@@ -667,29 +667,29 @@ def catalogue(request, department_id, feature, year):
     if feature == 'vak':
         title = 'Список статей ВАК'
         items = VAK.objects.filter(IdDeparture=department_id).values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
+            'id', 'Name', 'Accepted', 'Points', 'Comment', 'Year').order_by('-DateCreated')
     elif feature == 'thesisWorld':
         title = 'Список тезисов международных конференций'
         items = Thesis.objects.filter(IdDeparture=department_id, Type='M').values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
+            'id', 'Name', 'Accepted', 'Points', 'Comment', 'Year').order_by('-DateCreated')
         feature = 'thesis'  # Переопределение для шаблона Edit
     elif feature == 'thesisNation':
         title = 'Список тезисов национальных конференций'
         items = Thesis.objects.filter(IdDeparture=department_id, Type='N').values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
+            'id', 'Name', 'Accepted', 'Points', 'Comment', 'Year').order_by('-DateCreated')
         feature = 'thesis'  # Переопределение для шаблона Edit
     elif feature == 'monograph':
         title = 'Список монографий'
         items = Monograph.objects.filter(IdDeparture=department_id).values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
+            'id', 'Name', 'Accepted', 'Points', 'Comment', 'Year').order_by('-DateCreated')
     elif feature == 'income':
         title = 'Список НИР'
         items = Income.objects.filter(IdDeparture=department_id).values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
+            'id', 'Name', 'Accepted', 'Points', 'Comment', 'Year').order_by('-DateCreated')
     elif feature == 'rid':
         title = 'Список РИД'
         items = RID.objects.filter(IdDeparture=department_id).values(
-            'id', 'Name', 'Accepted', 'Points', 'Comment').order_by('-DateCreated')
+            'id', 'Name', 'Accepted', 'Points', 'Comment', 'Year').order_by('-DateCreated')
         
     depart = Departure.objects.get(pk=department_id)
     
