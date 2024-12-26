@@ -16,23 +16,25 @@ class DuplicatesFilter(admin.SimpleListFilter):
         ]
 
     def queryset(self, request, queryset):
-        if self.value() == 'dubl':
-            # Получение публикаций, которые имеют дубликаты
-            # Приводим название публикации к нижнему регистру и присваеваем этому полю 'lower_name'
-            # Группруем по новому полю 'lower_name'
-            # Считаем количество публикаций и записываем количество в поле 'count'
-            # Фильтруем записи, где 'count' больше 1 (есть дубликаты)
-            # Получаем словарь с ключами lower_name и count
-            duplicate_names = VAK.objects.annotate(lower_name=Lower('Name')).\
-                values('lower_name').\
-                annotate(count=Count('lower_name')).\
-                filter(Q(count__gt=1))
-    
-            # Формируем список из названием статей, которые хранятся в словаре duplicate_names с ключем 'lower_name'
-            list_duplicate = [dn['lower_name'] for dn in duplicate_names]
+        # Получение публикаций, которые имеют дубликаты
+        # Приводим название публикации к нижнему регистру и присваеваем этому полю 'lower_name'
+        # Группруем по новому полю 'lower_name'
+        # Считаем количество публикаций и записываем количество в поле 'count'
+        # Фильтруем записи, где 'count' больше 1 (есть дубликаты)
+        # Получаем словарь с ключами lower_name и count
+        duplicate_names = queryset.annotate(lower_name=Lower('Name')). \
+            values('lower_name'). \
+            annotate(count=Count('lower_name')). \
+            filter(Q(count__gt=1))
 
+        # Формируем список из названием статей, которые хранятся в словаре duplicate_names с ключем 'lower_name'
+        list_duplicate = [dn['lower_name'] for dn in duplicate_names]
+
+        if self.value() == 'dubl':
             # Формируем queryset из статей из списка дубляжей, предварительно приводя все названия публикаций к нижнему регистру
             return queryset.annotate(lower_name=Lower('Name')).filter(lower_name__in=list_duplicate)
+        elif self.value() == 'single':
+            return queryset.annotate(lower_name=Lower('Name')).exclude(lower_name__in=list_duplicate)
         else:
             return queryset
 
