@@ -164,8 +164,8 @@ class VAKForm(ModelForm):
 
     class Meta:
         model = VAK
-        fields = ['Name', 'Output', 'Tom', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author']  # Порядок отображения полей
+        fields = ['IdDeparture', 'Name', 'Output', 'Tom', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
+                  'Accepted', 'Points', 'Comment', 'Author']  # Порядок отображения полей
 
         widgets = {
             'IdDeparture': Select(attrs={
@@ -245,8 +245,8 @@ class ThesisForm(ModelForm):
 
     class Meta:
         model = Thesis
-        fields = ['Type','Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author']
+        fields = ['IdDeparture', 'Type','Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
+                  'Accepted', 'Points', 'Comment', 'Author']
 
         widgets = {
             'IdDeparture': Select(attrs={
@@ -325,8 +325,8 @@ class MonographForm(ModelForm):
 
     class Meta:
         model = Monograph
-        fields = ['Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'IdDeparture', 'Accepted', 'Points', 'Comment', 'Author']
+        fields = ['IdDeparture', 'Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
+                  'Accepted', 'Points', 'Comment', 'Author']
 
         widgets = {
             'IdDeparture': Select(attrs={
