@@ -48,21 +48,21 @@ class InstituteAdmin(admin.ModelAdmin):
 class VAKAdmin(admin.ModelAdmin):
     list_display = ('Name', 'IdDeparture', 'Author', 'DateCreated', 'Accepted')
     list_display_links = ('Name', )
-    list_filter = ('IdDeparture','Author', DuplicatesFilter)
+    list_filter = ('IdDeparture', 'Accepted', DuplicatesFilter)
     search_fields = ('Name', 'IdDeparture__Name', 'Author__username')
     
 
 class ThesisAdmin(admin.ModelAdmin):
     list_display = ('Name', 'IdDeparture', 'Author', 'DateCreated', 'Accepted')
     list_display_links = ('Name', )
-    list_filter = ('IdDeparture','Author', DuplicatesFilter)
+    list_filter = ('IdDeparture', 'Accepted', DuplicatesFilter)
     search_fields = ('Name', 'IdDeparture__Name', 'Author__username')
     
     
 class MonographAdmin(admin.ModelAdmin):
     list_display = ('Name', 'IdDeparture', 'Author', 'DateCreated', 'Accepted')
     list_display_links = ('Name', )
-    list_filter = ('IdDeparture','Author', DuplicatesFilter)
+    list_filter = ('IdDeparture', 'Accepted', DuplicatesFilter)
     search_fields = ('Name', 'IdDeparture__Name', 'Author__username')
 
 
