@@ -111,7 +111,7 @@ class InstituteForm(ModelForm):
 
     class Meta:
         model = Institute
-        fields = ['Name', 'ShortName', 'IdDirector', 'IdDeputeScience']
+        fields = ['Name', 'ShortName', 'Director', 'DeputeScience']
 
         widgets = {
             'Name': TextInput(attrs={
@@ -124,13 +124,13 @@ class InstituteForm(ModelForm):
                 'id': 'ShortName',
                 'placeholder': 'Введите аббревиатуру Института',
             }),
-            'IdDirector': Select(attrs={
+            'Director': Select(attrs={
                 'class': 'form-select',
-                'id': 'IdDirector',
+                'id': 'Director',
             }),
-            'IdDeputeScience': Select(attrs={
+            'DeputeScience': Select(attrs={
                 'class': 'form-select',
-                'id': 'IdDeputeScience',
+                'id': 'DeputeScience',
             }),
         }
 
@@ -160,83 +160,100 @@ class FAQForm(ModelForm):
         }
 
 
-class VAKForm(ModelForm):
-
+class BaseForm(ModelForm):
     class Meta:
-        model = VAK
-        fields = ['IdDeparture', 'Name', 'Output', 'Tom', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'Accepted', 'Points', 'Comment', 'Author']  # Порядок отображения полей
-
         widgets = {
-            'IdDeparture': Select(attrs={
+            'Departure': Select(attrs={
                 'class': 'form-select',
-                'id': 'IdDeparture',
-            }),
-            'Name': Textarea(attrs={
-                'class': 'form-control ',
-                'id': 'Name',
-                'placeholder': 'Введите название публикации',
-                'rows': 5
-            }),
-            'Output': TextInput(attrs={
-                'class': 'form-control',
-                'id': 'Output',
-                'placeholder': 'Введите название журнала'
-            }),
-            'Tom': TextInput(attrs={
-                'class': 'form-control',
-                'id': 'Tom',
-                'placeholder': 'Введите том издания (при налиичии)',
-                'required': False
+                'id': 'Departure',
             }),
             'Year': NumberInput(attrs={
                 'class': 'form-control',
                 'id': 'Year',
-                'placeholder': 'Введите год издания, например: 2021',
-            }),
-            'Pages': TextInput(attrs={
-                'class': 'form-control',
-                'id': 'Pages',
-                'placeholder': 'Например, 5-8',
-                'required': False
+                'placeholder': 'Введите год, например: 2024',
             }),
             'DepartmentSame': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'DepartmentSame',
                 'placeholder': '(по возможности с указанием кафедры)',
-                'rows': 5
+                'rows': 5,
             }),
             'DepartmentOther': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'DepartmentOther',
                 'placeholder': '(по возможности с указанием кафедры)',
-                'rows': 5
-            }),
-            'Url': URLInput(attrs={
-                'class': 'form-control',
-                'id': 'Url',
-                'placeholder': 'https://elibrary.ru/',
+                'rows': 5,
             }),
             'Accepted': CheckboxInput(attrs={
                 'class': 'form-check-input',
                 'id': 'Accepted',
-                'required': False
+                'required': False,
             }),
             'Points': NumberInput(attrs={
                 'class': 'form-control',
                 'id': 'Points',
-                'required': False
+                'required': False,
             }),
             'Comment': Textarea(attrs={
                 'class': 'form-control',
                 'id': 'Comment',
+                'rows': 5,
                 'required': False,
-                'rows': 5
             }),
             'Author': Select(attrs={
                 'class': 'form-select',
                 'id': 'Author',
-                'hidden': True
+                'hidden': True,
+            }),
+        }
+                
+                
+class PublicationForm(BaseForm):
+    class Meta(BaseForm.Meta):
+        fields = ['Departure', 'Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
+                  'Accepted', 'Points', 'Comment', 'Author']
+    
+        widgets = {
+            **BaseForm.Meta.widgets,
+            'Name': Textarea(attrs={
+                'class': 'form-control',
+                'id': 'Name',
+                'placeholder': 'Введите название публикации',
+                'rows': 5,
+            }),
+            'Output': TextInput(attrs={
+                'class': 'form-control',
+                'id': 'Output',
+                'placeholder': 'Введите название журнала или конференции',
+            }),
+            'Pages': TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Например, 5-8',
+                'id': 'Pages',
+                'required': False,
+            }),
+
+            'Url': URLInput(attrs={
+                'class': 'form-control',
+                'id': 'Url',
+                'placeholder': 'https://',
+            }),
+        }
+
+
+class VAKForm(PublicationForm):
+
+    class Meta(PublicationForm.Meta):
+        model = VAK
+        fields = PublicationForm.Meta.fields[:3] + ['Tom'] + PublicationForm.Meta.fields[3:]
+
+        widgets = {
+            **PublicationForm.Meta.widgets,
+            'Tom': TextInput(attrs={
+                'class': 'form-control',
+                'id': 'Tom',
+                'placeholder': 'Введите том издания (при наличии)',
+                'required': False,
             }),
         }
 
@@ -245,78 +262,13 @@ class ThesisForm(ModelForm):
 
     class Meta:
         model = Thesis
-        fields = ['IdDeparture', 'Type','Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'Accepted', 'Points', 'Comment', 'Author']
+        fields = PublicationForm.Meta.fields[:1] + ['Type'] + PublicationForm.Meta.fields[1:]
 
         widgets = {
-            'IdDeparture': Select(attrs={
-                'class': 'form-select',
-                'id': 'IdDeparture',
-            }),
+            **PublicationForm.Meta.widgets,
             'Type': Select(attrs={
                 'class': 'form-select',
                 'id': 'Type',
-            }),
-            'Name': Textarea(attrs={
-                'class': 'form-control ',
-                'id': 'Name',
-                'placeholder': 'Введите название публикации',
-                'rows': 5
-            }),
-            'Output': TextInput(attrs={
-                'class': 'form-control',
-                'id': 'Output',
-                'placeholder': 'Введите полное название конференции'
-            }),
-            'Year': NumberInput(attrs={
-                'class': 'form-control',
-                'id': 'Year',
-                'placeholder': 'Введите год издания, например: 2021',
-            }),
-            'Pages': TextInput(attrs={
-                'class': 'form-control',
-                'id': 'Pages',
-                'placeholder': 'Например, 5-8',
-                'required': False
-            }),
-            'DepartmentSame': Textarea(attrs={
-                'class': 'form-control',
-                'id': 'DepartmentSame',
-                'placeholder': '(по возможности с указанием кафедры)',
-                'rows': 5
-            }),
-            'DepartmentOther': Textarea(attrs={
-                'class': 'form-control',
-                'id': 'DepartmentOther',
-                'placeholder': '(по возможности с указанием кафедры)',
-                'rows': 5
-            }),
-            'Url': URLInput(attrs={
-                'class': 'form-control',
-                'id': 'Url',
-                'placeholder': 'https://',
-                # 'required': False
-            }),
-            'Accepted': CheckboxInput(attrs={
-                'class': 'form-check-input',
-                'id': 'Accepted',
-                'required': False
-            }),
-            'Points': NumberInput(attrs={
-                'class': 'form-control',
-                'id': 'Points',
-                'required': False
-            }),
-            'Comment': Textarea(attrs={
-                'class': 'form-control',
-                'id': 'Comment',
-                'required': False,
-                'rows': 5
-            }),
-            'Author': Select(attrs={
-                'class': 'form-select',
-                'id': 'Author',
-                'hidden': True
             }),
         }
 
@@ -325,14 +277,10 @@ class MonographForm(ModelForm):
 
     class Meta:
         model = Monograph
-        fields = ['IdDeparture', 'Name', 'Output', 'Pages', 'Year', 'DepartmentSame', 'DepartmentOther', 'Url',
-                  'Accepted', 'Points', 'Comment', 'Author']
+        fields = PublicationForm.Meta.fields
 
         widgets = {
-            'IdDeparture': Select(attrs={
-                'class': 'form-select',
-                'id': 'IdDeparture',
-            }),
+            **PublicationForm.Meta.widgets,
             'Name': Textarea(attrs={
                 'class': 'form-control ',
                 'id': 'Name',
@@ -344,108 +292,27 @@ class MonographForm(ModelForm):
                 'id': 'Output',
                 'placeholder': 'Введите ISBN'
             }),
-            'Year': NumberInput(attrs={
-                'class': 'form-control',
-                'id': 'Year',
-                'placeholder': 'Введите год издания, например: 2021',
-            }),
-            'Pages': TextInput(attrs={
-                'class': 'form-control',
-                'id': 'Pages',
-                'placeholder': 'Например, 5-8',
-                'required': False
-            }),
-            'DepartmentSame': Textarea(attrs={
-                'class': 'form-control',
-                'id': 'DepartmentSame',
-                'placeholder': '(по возможности с указанием кафедры)',
-                'rows': 5
-            }),
-            'DepartmentOther': Textarea(attrs={
-                'class': 'form-control',
-                'id': 'DepartmentOther',
-                'placeholder': '(по возможности с указанием кафедры)',
-                'rows': 5
-            }),
-            'Url': URLInput(attrs={
-                'class': 'form-control',
-                'id': 'Url',
-                'placeholder': 'https://',
-            }),
-            'Accepted': CheckboxInput(attrs={
-                'class': 'form-check-input',
-                'id': 'Accepted',
-                'required': False
-            }),
-            'Points': NumberInput(attrs={
-                'class': 'form-control',
-                'id': 'Points',
-                'required': False
-            }),
-            'Comment': Textarea(attrs={
-                'class': 'form-control',
-                'id': 'Comment',
-                'required': False,
-                'rows': 5
-            }),
-            'Author': Select(attrs={
-                'class': 'form-select',
-                'id': 'Author',
-                'hidden': True
-            }),
         }
         
 
-class IncomeForm(ModelForm):
+class IncomeForm(BaseForm):
 
-    class Meta:
+    class Meta(BaseForm.Meta):
         model = Income
-        fields = ['IdDeparture', 'Name', 'Year', 'Accepted', 'Value', 'Points', 'Comment', 'Author']
+        fields = ['Departure', 'Name', 'Year', 'DepartmentSame', 'DepartmentOther', 'Accepted', 'Value',
+                  'Points', 'Comment', 'Author']
 
         widgets = {
-            'IdDeparture': Select(attrs={
-                'class': 'form-select',
-                'id': 'IdDeparture',
-            }),
+            **BaseForm.Meta.widgets,
             'Name': Textarea(attrs={
                 'class': 'form-control ',
                 'id': 'Name',
                 'placeholder': 'Введите наименование НИР (работы, услуги)',
                 'rows': 5
             }),
-            'Year': NumberInput(attrs={
-                'class': 'form-control',
-                'id': 'Year',
-                'placeholder': 'Введите год, например: 2024',
-            }),
-            
-            'Accepted': CheckboxInput(attrs={
-                'class': 'form-check-input',
-                'id': 'Accepted',
-                'required': False
-            }),
-    
             'Value': NumberInput(attrs={
                 'class': 'form-control',
                 'id': 'Value',
-                'required': False
-            }),
-            
-            'Points': NumberInput(attrs={
-                'class': 'form-control',
-                'id': 'Points',
-                'required': False
-            }),
-            'Comment': Textarea(attrs={
-                'class': 'form-control',
-                'id': 'Comment',
-                'required': False,
-                'rows': 5
-            }),
-            'Author': Select(attrs={
-                'class': 'form-select',
-                'id': 'Author',
-                'hidden': True
             }),
         }
 
@@ -453,50 +320,20 @@ class IncomeForm(ModelForm):
 class RidForm(ModelForm):
     class Meta:
         model = RID
-        fields = ['IdDeparture', 'Name', 'Year', 'Doc', 'Accepted', 'Points', 'Comment', 'Author']
+        fields = ['Departure', 'Name', 'Year', 'DepartmentSame', 'DepartmentOther', 'Doc', 'Accepted',
+                  'Points', 'Comment', 'Author']
         
         widgets = {
-            'IdDeparture': Select(attrs={
-                'class': 'form-select',
-                'id': 'IdDeparture',
-            }),
+            **BaseForm.Meta.widgets,
             'Name': Textarea(attrs={
                 'class': 'form-control ',
                 'id': 'Name',
                 'placeholder': 'Введите наименование РИД',
                 'rows': 5
             }),
-            'Year': NumberInput(attrs={
-                'class': 'form-control',
-                'id': 'Year',
-                'placeholder': 'Введите год, например: 2024',
-            }),
-            
             'Doc': FileInput(attrs={
                 'class': 'form-control',
                 'id': 'Doc',
             }),
-            
-            'Accepted': CheckboxInput(attrs={
-                'class': 'form-check-input',
-                'id': 'Accepted',
-                'required': False
-            }),
-            
-            'Points': NumberInput(attrs={
-                'class': 'form-control',
-                'id': 'Points',
-                'required': False
-            }),
-            'Comment': Textarea(attrs={
-                'class': 'form-control',
-                'id': 'Comment',
-                'required': False,
-                'rows': 5
-            }),
-            'Author': Select(attrs={
-                'class': 'form-select',
-                'id': 'Author',
-                'hidden': True
-            }),
+
         }

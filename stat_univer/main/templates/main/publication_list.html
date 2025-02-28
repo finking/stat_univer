@@ -35,13 +35,13 @@
             <tr>
                 <td> {{ item.Name }}
                     <br>
-                    <a href="{% url 'edit' feature_id=item.id  feature=model %}" >Редактировать</a>
+                    <a href="{{ item.get_absolute_url }}" >Редактировать</a>
                     <br>
                     {% if  item.Url and model != 'monograph' %}
                         <a href="{{ item.Url }}" target="_blank">Ссылка на источник</a>
                     {% endif %}
                 </td>
-              <td> {{ item.IdDeparture}} </td>
+              <td> {{ item.Departure}} </td>
                 {% if item.Accepted %}
                     <td> Да </td>
                 {% else %}

@@ -1,14 +1,16 @@
 from django.db import models
+from django.db.models import Sum
 from django.contrib.auth.models import User
+from django.urls import reverse
+
 from .utils import *
-from django.utils import timezone
 
 
 class Institute(models.Model):
     Name = models.CharField('Название', max_length=70,
-                            error_messages={'required': 'Please enter your name'})
+                            error_messages={'required': 'Please enter your initial_feature'})
     ShortName = models.CharField('Аббревиатура', max_length=10)
-    IdDirector = models.ForeignKey(
+    Director = models.ForeignKey(
         'Employee',
         related_name='Director',
         on_delete=models.SET_NULL,
@@ -17,7 +19,7 @@ class Institute(models.Model):
         default='No',
         verbose_name='Директор'
     )
-    IdDeputeScience = models.ForeignKey(
+    DeputeScience = models.ForeignKey(
         'Employee',
         related_name='Depute',
         on_delete=models.SET_NULL,
@@ -111,23 +113,11 @@ class Employee(models.Model):
 
 class Departure(models.Model):
     Name = models.CharField('Название', max_length=80)
-    IdInstitute = models.ForeignKey(
+    Institute = models.ForeignKey(
         'Institute',
         verbose_name='Институт',
         on_delete=models.SET_NULL, null=True, help_text='Выберите название института.'
     )
-
-    # Плановые показатили для кафедры (Для дохода и РИДов еще и фактические).
-    PlanVak = models.IntegerField('Публикации ВАК. План', default=0)
-    PlanthesisWorld = models.IntegerField('Тезисы в Межд. конференциях. План', default=0)
-    PlanthesisNation = models.IntegerField('Тезисы в Нац. конференциях. План', default=0)
-    PlanMonograph = models.IntegerField('Монографии. План', default=0)
-    
-    PlanIncome = models.FloatField('Плановый объем дохода, руб.', default=0)
-    FactIncome = models.FloatField('Фактический объем дохода, руб.', default=0)
-    
-    PlanRID = models.FloatField('РИД. План', default=0)
-    FactRID = models.FloatField('РИД. Факт', default=0)
 
     class Meta:
         verbose_name = "Кафедру"
@@ -135,6 +125,27 @@ class Departure(models.Model):
 
     def __str__(self):
         return self.Name
+    
+    # Получение фактического количества статей ВАК
+    def get_fact_vak(self, year):
+        return self.vak_set.filter(Year=year, Accepted=True).aggregate(sum=Sum('Points'))['sum']
+    
+    # Получение фактического количества тезисов
+    def get_fact_thesis(self, year, type='M'):
+        return self.thesis_set.filter(Year=year, Accepted=True, Type=type).aggregate(sum=Sum('Points'))['sum']
+    
+    # Получение фактического количества монографий
+    def get_fact_monograph(self, year):
+        return self.monograph_set.filter(Year=year, Accepted=True).aggregate(sum=Sum('Points'))['sum']
+    
+    # Получение фактического количества РИД
+    def get_fact_rid(self, year):
+        return self.rid_set.filter(Year=year, Accepted=True).aggregate(sum=Sum('Points'))['sum']
+    
+    # Получение фактического Дохода
+    def get_fact_income(self, year):
+        return self.income_set.filter(Year=year, Accepted=True).aggregate(sum=Sum('Points'))['sum']
+
 
 
 class Conference(models.Model):
@@ -197,6 +208,18 @@ class Conference(models.Model):
 
     def __str__(self):
         return self.Name
+    
+    # Функция преобразования True/False для записи в файл
+    def get_student_display(self):
+        return "да" if self.Student else "нет"
+
+    # Функция преобразования True/False для записи в файл
+    def get_organizer_display(self):
+        return "да" if self.Organizer else "нет"
+
+    # Функция преобразования даты для записи в файл
+    def get_timeCreate(self):
+        return self.TimeCreate.strftime("%d-%m-%Y %H:%M:%S")
 
 
 class FAQ(models.Model):
@@ -217,27 +240,16 @@ class FAQ(models.Model):
         return self.Question
 
 
-class Publication(models.Model):
+class BaseModel(models.Model):
     class Meta:
         abstract = True
-    
-    Name = models.CharField('Название публикации', max_length=250)
-    Output = models.CharField('Полное название конференции', max_length=250)
+
     Year = models.IntegerField('Год')
-    Pages = models.CharField('Страницы', max_length=50,
-                                blank=True,
-                                null=True)
     DepartmentSame = models.CharField('Авторы ГУУ с отчетной кафедры', max_length=250)
     DepartmentOther = models.CharField('Авторы с других кафедр ГУУ',
                                        max_length=250,
                                        blank=True,
                                        null=True)
-
-    Url = models.URLField('Ссылка на Ринц или сборник конференции', max_length=500,
-                          help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
-                          blank=True,
-                          null=True)
-    
     Accepted = models.BooleanField('Принято: ', default=False)
     Points = models.FloatField('Количество баллов: ',
                                default=0,
@@ -245,9 +257,7 @@ class Publication(models.Model):
     Comment = models.TextField('Комментарий отдела статистики: ',
                                blank=True,
                                null=True)
-    
-
-    IdDeparture = models.ForeignKey(
+    Departure = models.ForeignKey(
         'Departure',
         verbose_name='Кафедра',
         on_delete=models.PROTECT,
@@ -257,7 +267,38 @@ class Publication(models.Model):
     Author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     DateCreated = models.DateTimeField(auto_now_add=True, verbose_name='Дата внесения')
     DateUpdated = models.DateTimeField(auto_now=True)
+
+    def get_absolute_url(self):
+        # Используем lowercase название модели как часть URL
+        model_name = self._meta.model_name
+        return reverse(f'{model_name}_update', kwargs={'pk': self.pk})
     
+    # Функция преобразования True/False для записи в файл
+    def get_accepted_display(self):
+        return "да" if self.Accepted else "нет"
+
+    # Функция преобразования даты для записи в файл
+    def get_date_created(self):
+        return self.DateCreated.strftime("%d-%m-%Y %H:%M:%S")
+    
+    def get_date_updated(self):
+        return self.DateUpdated.strftime("%d-%m-%Y %H:%M:%S")
+    
+class Publication(BaseModel):
+    class Meta:
+        abstract = True
+        
+    Name = models.CharField('Название публикации', max_length=250)
+    Output = models.CharField('Полное название конференции', max_length=250)
+    Pages = models.CharField('Страницы', max_length=50,
+                                blank=True,
+                                null=True)
+
+    Url = models.URLField('Ссылка на Ринц или сборник конференции', max_length=500,
+                          help_text='Ссылка должна начинаться с http:// или https:// (например: https://yandex.ru/)',
+                          blank=True,
+                          null=True)
+
 
 class VAK(Publication):
     class Meta:
@@ -307,36 +348,19 @@ class Monograph(Publication):
                           null=True)
 
 
-class Income(models.Model):
+class Income(BaseModel):
     class Meta:
         verbose_name = "Доход"
         verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.Name
-
-    IdDeparture = models.ForeignKey(
-        'Departure',
-        verbose_name='Кафедра',
-        on_delete=models.CASCADE,
-        help_text='Выберите название кафедры.',
-        default='-'
-    )
     
     Name = models.CharField('Наименование НИР (работы, услуги)', max_length=500)
-    Year = models.IntegerField('Год')
     Value = models.FloatField('Сумма НИР', default=0,  help_text='Укажите сумму договора')
-    Points = models.FloatField('Зачтенная сумма НИР', default=0, blank=True)
-    Accepted = models.BooleanField('Принято: ', default=False)
-    Comment = models.TextField('Комментарий отдела статистики: ',
-                               blank=True,
-                               null=True)
-    Author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    DateCreated = models.DateTimeField(auto_now_add=True, verbose_name='Дата внесения')
-    DateUpdated = models.DateTimeField(auto_now=True)
 
 
-class RID(models.Model):
+class RID(BaseModel):
     class Meta:
         verbose_name = "РИД"
         verbose_name_plural = "РИДы"
@@ -344,26 +368,9 @@ class RID(models.Model):
     def __str__(self):
         return self.Name
     
-    IdDeparture = models.ForeignKey(
-        'Departure',
-        verbose_name='Кафедра',
-        on_delete=models.CASCADE,
-        help_text='Выберите название кафедры.',
-        default='-'
-    )
-    
     Name = models.CharField('Наименование РИД', max_length=500)
-    Year = models.IntegerField('Год')
-    Doc = models.FileField(verbose_name='Свидетельство', upload_to='docs', default=None, blank=True, null=True,
+    Doc = models.FileField(verbose_name='Свидетельство', upload_to='docs', default=None,
                            max_length=300)
-    Points = models.FloatField('Значение', default=0, blank=True)
-    Accepted = models.BooleanField('Принято: ', default=False)
-    Comment = models.TextField('Комментарий отдела статистики: ',
-                               blank=True,
-                               null=True)
-    Author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    DateCreated = models.DateTimeField(auto_now_add=True, verbose_name='Дата внесения')
-    DateUpdated = models.DateTimeField(auto_now=True)
     
 
 class Plan(models.Model):

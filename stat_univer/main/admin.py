@@ -40,30 +40,30 @@ class DuplicatesFilter(admin.SimpleListFilter):
 
 
 class InstituteAdmin(admin.ModelAdmin):
-    list_display = ('Name', 'ShortName', 'IdDirector', 'IdDeputeScience')
+    list_display = ('Name', 'ShortName', 'Director', 'DeputeScience')
     list_display_links = ('Name', 'ShortName')
     search_fields = ('Name',)
 
 
 class VAKAdmin(admin.ModelAdmin):
-    list_display = ('Name', 'IdDeparture', 'Author', 'DateCreated', 'Accepted')
+    list_display = ('Name', 'Departure', 'Author', 'DateCreated', 'Accepted')
     list_display_links = ('Name', )
-    list_filter = ('IdDeparture', 'Accepted', DuplicatesFilter)
-    search_fields = ('Name', 'IdDeparture__Name', 'Author__username')
+    list_filter = ('Departure', 'Accepted', DuplicatesFilter)
+    search_fields = ('Name', 'Departure__Name', 'Author__username')
     
 
 class ThesisAdmin(admin.ModelAdmin):
-    list_display = ('Name', 'IdDeparture', 'Author', 'DateCreated', 'Accepted')
+    list_display = ('Name', 'Departure', 'Author', 'DateCreated', 'Accepted')
     list_display_links = ('Name', )
-    list_filter = ('IdDeparture', 'Accepted', DuplicatesFilter)
-    search_fields = ('Name', 'IdDeparture__Name', 'Author__username')
+    list_filter = ('Departure', 'Accepted', DuplicatesFilter)
+    search_fields = ('Name', 'Departure__Name', 'Author__username')
     
     
 class MonographAdmin(admin.ModelAdmin):
-    list_display = ('Name', 'IdDeparture', 'Author', 'DateCreated', 'Accepted')
+    list_display = ('Name', 'Departure', 'Author', 'DateCreated', 'Accepted')
     list_display_links = ('Name', )
-    list_filter = ('IdDeparture', 'Accepted', DuplicatesFilter)
-    search_fields = ('Name', 'IdDeparture__Name', 'Author__username')
+    list_filter = ('Departure', 'Accepted', DuplicatesFilter)
+    search_fields = ('Name', 'Departure__Name', 'Author__username')
 
 
 class PlanAdmin(admin.ModelAdmin):
@@ -73,15 +73,15 @@ class PlanAdmin(admin.ModelAdmin):
 
 
 class IncomeAdmin(admin.ModelAdmin):
-    list_display = ('Name', 'IdDeparture', 'Author', 'Year', 'Points')
-    list_filter = ('IdDeparture', 'Author', 'Year')
-    search_fields = ('Name', 'IdDeparture__Name', )
+    list_display = ('Name', 'Departure', 'Author', 'Year', 'Points')
+    list_filter = ('Departure', 'Author', 'Year')
+    search_fields = ('Name', 'Departure__Name', )
 
     
 class RIDAdmin(admin.ModelAdmin):
-    list_display = ('Name', 'IdDeparture', 'Author', 'Year', 'Points')
-    list_filter = ('IdDeparture', 'Author', 'Year')
-    search_fields = ('Name', 'IdDeparture__Name', )
+    list_display = ('Name', 'Departure', 'Author', 'Year', 'Points')
+    list_filter = ('Departure', 'Author', 'Year')
+    search_fields = ('Name', 'Departure__Name', )
 
 
 admin.site.register(Institute, InstituteAdmin)

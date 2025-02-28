@@ -29,19 +29,50 @@
                 </tr>
                 </thead>
              <tbody>
-            {% for institute in total_list %}
+            {% for institute in institutes %}
                 <tr class="table-primary">
                     <td colspan="4" class="fs-4">
-                        <a href="{% url 'report' institute_id=institute.id year=year %}"> {{ institute.name }} </a>
+                        <a href="{% url 'report' institute_id=institute.id year=year %}"> {{ institute.Name }} </a>
                     </td>
                 </tr>
-                {% for k, value in institute.values.items %}
-
+                {% for indicator, plan_fact in institute.report_data.total.items %}
                     <tr class="table-light">
-                    <td style="padding-left: 25px;"> {{value.name}} </td>
-                    <td>{{ value.plan|floatformat:"-2g"}}</td>
-                    <td>{{ value.fact|floatformat:"-2g" }} </td>
-                    <td>{{ value.proc|floatformat:"-2g" }} %</td>
+
+                    {% for i in plan_fact %}
+                        {% if forloop.first %}
+                            <td style="padding-left: 25px;"> {{i}} </td>
+                        {% elif forloop.last %}
+                            {% if i %}
+                                <td>{{ i|floatformat:"-2g" }} %</td>
+                            {% else %}
+                                <td> n/a </td>
+                        {% endif %}
+                        {% else %}
+                            {% if user.is_authenticated %}
+                            <td>{{ i|floatformat:"-2g"}}</td>
+                            {% else %}
+                             <td>
+                                 <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                >
+                                  <circle cx="12" cy="16" r="1" />
+                                  <rect x="3" y="10" width="18" height="12" rx="2" />
+                                  <path d="M7 10V7a5 5 0 0 1 10 0v3" />
+                                </svg>
+                                 <a href="{% url 'login' %}?next={{ request.path }}"> Войти </a>
+                             </td>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+
                     </tr>
 
                 {% endfor %}
@@ -64,6 +95,8 @@
         <hr>
         <div class="text-center">
             <h3>План-факт прошлых лет</h3>
+             <a href=" {% url 'main' year=2024 %} " > 2024 год </a>
+            <br>
              <a href=" {% url 'main' year=2023 %} " > 2023 год </a>
             <br>
              <p> 2022 год </p>

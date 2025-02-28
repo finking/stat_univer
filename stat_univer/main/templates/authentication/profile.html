@@ -28,12 +28,12 @@
         </h2>
         <ul class="icon-list">
           <li>
-              <a href=" {% url 'main' year=year%} ">План-факт</a>
+              <a href=" {% url 'main' year=current_year%} ">План-факт</a>
           </li>
-          <li><a href="{% url 'history' %}" >Конференции</a></li>
           <li><a href="{% url 'vakList' %}">Публикации ВАК</a></li>
-          <li><a href="{% url 'thesisList' %}">Тезисы конференции</a></li>
-          <li><a href="{% url 'monographList' %}">Монографии</a></li>
+            <li><a href="{% url 'thesisList' %}">Тезисы конференции</a></li>
+            <li><a href="{% url 'monographList' %}">Монографии</a></li>
+            <li><a href="{% url 'history' %}" >Конференции</a></li>
         </ul>
       </div>
 
@@ -47,23 +47,27 @@
         </h2>
         <ul class="icon-list">
           <li>
-              <a href="{% url 'vak' %}" >Статья ВАК </a>
+              <a href="{% url 'vak_create' %}" >Статья ВАК </a>
           </li>
           <li>
-              <a href="{% url 'thesis' %}" >Тезисы конференций </a>
+              <a href="{% url 'thesis_create' %}" >Тезисы конференций </a>
           </li>
           <li>
-              <a href="{% url 'monograph' %}" > Монография </a>
+              <a href="{% url 'monograph_create' %}" > Монография </a>
           </li>
           <li>
-              <a href="{% url 'income' %}" > Доход по НИР </a>
+              <a href="{% url 'income_create' %}" > Доход по НИР </a>
           </li>
           <li>
-              <a href="{% url 'rid' %}" > РИД </a>
+              <a href="{% url 'rid_create' %}" > РИД </a>
+          </li>
+          <li>
+              <a href="{% url 'conference' %}" > Конференции </a>
           </li>
 
         </ul>
       </div>
+        {% if user.is_authenticated %}
           <div class="text-center">
             <h2>
                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person" viewBox="0 2 16 16" >
@@ -74,7 +78,7 @@
             <a href="{% url 'change-password' %}" style="text-align: center" >Изменить пароль</a>
 
           </div>
-
+         {% endif %}
     </div>
 </div>
 </div>

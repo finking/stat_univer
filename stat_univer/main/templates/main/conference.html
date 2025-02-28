@@ -7,9 +7,16 @@
 {% block content %}
 <div class="col-md-6 offset-md-3">
     <h1 class="text-center alert alert-primary">Конференции</h1>
-
+    {% if messages%}
+        {% for message in messages%}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor%}
+    {% endif%}
     <div class="col-12">
-        <a href="{% url 'history' %}"> История внесения конференций.</a>
+        <a href="{% url 'history' %}"> История внесения конференций</a>
     </div>
   <hr>
       <div class="col-12">
@@ -105,7 +112,5 @@
       </div>
     </div>
     <br>
-<!--    <br>-->
-<!--    <br>-->
-<!--    <a href="{% url 'vvod' %}">Назад</a>-->
+
 {% endblock %}

@@ -33,15 +33,15 @@
             type: 'bar',
             data: {
               labels: [
-              {% for k,v in total_list.items %}
-                '{{ k }}',
+              {% for shortName in objects.keys %}
+                '{{ shortName }}',
               {% endfor %}
               ],
               datasets: [{
                 label: '% от плана ({{ feature}})',
                 data: [
-                  {% for k,v  in total_list.items %}
-                    {{ v | floatformat:"3u" }},
+                  {% for value in objects.values %}
+                    {{ value | floatformat:"2u" }},
                   {% endfor %}
                 ],
                 borderWidth: 1,

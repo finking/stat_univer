@@ -25,7 +25,7 @@
         </h2>
         <p> В данном подразделе указаны ссылки для просмотра уже имеющейся информации.</p>
         <ul class="icon-list">
-          <li><a href="{% url 'dashboard' %}" >Дашборд</a></li>
+          <li><a href="{% url 'dashboard' year=current_year %}" >Дашборд</a></li>
           <li><a href="{% url 'institute' %}" >Институты</a></li>
           <li><a href="{% url 'history' %}" >Конференции</a></li>
           <li><a href="{% url 'vakList' %}">Публикации ВАК</a></li>
@@ -45,11 +45,11 @@
         <p>В данном подразделе указаны ссылки для добавления новой информации.</p>
         <ul class="icon-list">
           <li><a href="{% url 'conference' %} ">Добавить конференцию</a></li>
-          <li><a href="{% url 'vak' %} ">Добавить статью ВАК</a></li>
-          <li><a href="{% url 'thesis' %} ">Добавить тезисы конференций</a></li>
-          <li><a href="{% url 'monograph' %} ">Добавить монографию</a></li>
-          <li><a href="{% url 'income' %}">Добавить доход по НИР</a></li>
-          <li><a href="{% url 'rid' %}">Добавить РИД</a></li>
+          <li><a href="{% url 'vak_create' %} ">Добавить статью ВАК</a></li>
+          <li><a href="{% url 'thesis_create' %} ">Добавить тезисы конференций</a></li>
+          <li><a href="{% url 'monograph_create' %} ">Добавить монографию</a></li>
+          <li><a href="{% url 'income_create' %}">Добавить доход по НИР</a></li>
+          <li><a href="{% url 'rid_create' %}">Добавить РИД</a></li>
         </ul>
       </div>
     </div>

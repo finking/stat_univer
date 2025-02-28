@@ -34,20 +34,20 @@
                           <a href="{% url 'index' %}" class="nav-link px-2">Главная</a>
                         </li>
                         <li class="nav-item">
-                          <li><a href="{% url 'vvod' %}" class="nav-link px-2">Формы для заполнения</a></li>
+                          <a href="{% url 'faq' %}" class="nav-link px-2">Частые вопросы</a>
                         </li>
-                          <li class="nav-item">
-                          <li><a href="{% url 'faq' %}" class="nav-link px-2">Частые вопросы</a></li>
-                        </li>
-                        </li>
-                          <li class="nav-item">
-                          <li><a href="{% url 'dashboard' %}" class="nav-link px-2">Дашборд</a></li>
-                        </li>
-                        {% if user.is_authenticated %}
                         <li class="nav-item">
-                          <li><a href="{% url 'profile' %}" class="nav-link px-2">Профиль</a></li>
+                          <a href="{% url 'dashboard' year=current_year %}" class="nav-link px-2">Дашборд</a>
                         </li>
-                        {% endif %}
+                          {% if user.is_authenticated %}
+                        <li class="nav-item">
+                          <a href="{% url 'profile' %}" class="nav-link px-2">Профиль</a>
+                        </li>
+                          {% else %}
+                          <li class="nav-item">
+                            <a href="{% url 'main' year=current_year %}" class="nav-link px-2">План-факт</a>
+                          </li>
+                          {% endif %}
                       </ul>
                     <div class="text-end">
                       <ul class="navbar-nav">

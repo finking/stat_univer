@@ -14,16 +14,16 @@
 
 <div class="container">
     {% if institutes %}
-        {% for el in institutes %}
+        {% for obj in institutes %}
         <div class="row mt-4 mb-3">
             <div class="col-8 offset-2 text-center border border-primary rounded">
-                <div class="h3"> {{ el.Name }} </div>
-            {% if el.IdDirector%}
-                <div> Директор: {{ el.IdDirector }} </div>
+                <div class="h3"> {{ obj.Name }} </div>
+            {% if obj.Director%}
+                <div> Директор: {{ obj.Director }} </div>
              {% endif %}
 
-            {% if el.IdDeputeScience%}
-                <div class="mb-2"> Зам. директора по науке: {{ el.IdDeputeScience }} </div>
+            {% if obj.DeputeScience%}
+                <div class="mb-2"> Зам. директора по науке: {{ obj.DeputeScience }} </div>
             {% else %}
                 <div class="mb-2"> </div>
             {% endif %}
@@ -35,5 +35,4 @@
     {% endif %}
 </div>
 
-<!--<a href="{% url 'vvod' %}">Назад</a>-->
 {% endblock %}

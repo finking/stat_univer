@@ -19,7 +19,7 @@
     {% endif%}
 
     <div class="col-12">
-        <h3 class="text-center">  {{ depart.IdInstitute }} → {{ depart }}</h3>
+        <h3 class="text-center">  {{ departure.Institute }} → {{ departure.Name }}</h3>
             {% include 'main/back.html' %}
         <br>
         <table class="table table-bordered border border-2 table-hover">
@@ -34,23 +34,23 @@
               </thead>
              <tbody>
  <!-- https://stackoverflow.com/questions/25385289/how-to-set-the-size-of-a-column-in-a-bootstrap-responsive-table-->
-             {% for publication in page_obj %}
+             {% for obj in object_list %}
                 <tr class="table-light d-flex">
 
-                    {% if  publication.Accepted%}
+                    {% if obj.Accepted%}
                       <td class="col-5">
-                        {{ publication.Name }}
+                        {{ obj.Name }}
                       </td>
                       <td class="col-1 text-center"> Да </td>
                     {% else %}
                       <td class="col-5">
-                        <a href="{% url 'edit' feature_id=publication.id feature=feature %}" target="_blank"> {{ publication.Name }} </a>
+                        <a href="{{ obj.get_absolute_url}}" target="_blank"> {{ obj.Name }} </a>
                       </td>
                       <td class="col-1 text-center"> Нет </td>
                     {% endif%}
-                  <td class="col-1 text-center">{{ publication.Points }}</td>
-                  <td class="col-1 text-center">{{ publication.Year }}</td>
-                  <td class="col-4">{{ publication.Comment }}</td>
+                  <td class="col-1 text-center">{{ obj.Points }}</td>
+                  <td class="col-1 text-center">{{ obj.Year }}</td>
+                  <td class="col-4">{{ obj.Comment }}</td>
                 </tr>
             {% endfor%}
             </tbody>

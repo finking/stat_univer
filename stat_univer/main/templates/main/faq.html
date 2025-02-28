@@ -8,8 +8,9 @@
 
 <div class="container">
   <h1 class="text-center  alert alert-primary"> Ответы на часто задаваемые вопросы</h1>
-  <p class="text-center"> Нажмите на интересующий вас вопрос,чтобы увидеть на него ответ.</p>
+
     {% if faqs %}
+      <p class="text-center"> Нажмите на интересующий вас вопрос,чтобы увидеть на него ответ.</p>
         <div class="accordion" id="accordionFaq">
         {% for faq in faqs%}
             <div class="accordion-item border mt-3">

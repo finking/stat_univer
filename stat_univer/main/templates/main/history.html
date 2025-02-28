@@ -13,49 +13,44 @@
         История внесения Конференций</h1>
     <br>
 <div class="row ">
-        {% if method %}
-            <div class="col-3 offset-4">
-                <form class="card p-2" method="post" action="history">
-                  {% csrf_token %}
-                   <div class="input-group">
-                        <p>Чтобы увидеть историю внесенных Вами конференций, введите email,
-                        который вы указывали при их внесении: </p>
-                        {{ form.as_p }}
-                        <button type="submit" class="btn btn-primary">Показать внесенные конференции</button>
-                    </div>
-                </form>
-            </div>
-      {% else %}
-          <div class="col-6 offset-2">
+<div class="col-4 offset-4">
+    <form class="card p-2" method="post" action="history">
+      {% csrf_token %}
+       <div class="input-group d-flex justify-content-center text-center">
+            <p>Чтобы увидеть историю конференций, введите email,
+            который вы указывали при их внесении: </p>
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Показать внесенные конференции</button>
+        </div>
+    </form>
+    <br>
+    {% if conferences_history %}
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-primary">Найдено конференций: </span>
+          <span class="badge bg-primary rounded-pill"> {{ conferences_history.count }}</span>
+        </h4>
 
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-              <span class="text-primary">Найдено конференций: </span>
-              <span class="badge bg-primary rounded-pill"> {{ qty_history }}</span>
-            </h4>
-              {% if conferences_history %}
-              <ul class="list-group mb-3">
-                {% for conference in conferences_history %}
-                  <li class="list-group-item d-flex justify-content-between lh-sm">
-                    <div>
+        <ul class="list-group b-3">
+        {% for conference in conferences_history %}
+            <li class="list-group-item border p-2">
+                <div>
                       <h6 class="my-0">{{ conference.Name }} </h6>
                       <small class="text-muted">{{ conference.City}}</small>
-                    </div>
-    <!--                <span class="text-muted">$12</span>-->
-                  </li>
-                  <br>
-                {% endfor %}
-              </ul>
-             {% elif message %}
-              <ul class="list-group mb-3">
-               <li class="list-group-item d-flex justify-content-between lh-sm">
-                      <h6 class="my-0"> {{ message }} </h6>
-               </li>
-              </ul>
-            {% endif %}
-              <a href="{% url 'conference' %}">Назад на страницу внесения конференций.</a>
-          </div>
+                </div>
+            </li>
+            <br>
+        {% endfor %}
+        </ul>
 
-      {% endif %}
+    {% else%}
+        {% if request.method == 'POST' %}
+            <p class="border p-2"><b>Конференций по указанному email не найдено </b></p>
+        {% endif %}
+    {% endif %}
+    <div class="text-center">
+        <a href="{% url 'conference' %}">На страницу внесения конференций</a>
+    </div>
+    </div>
 </div>
 
 {% endblock %}

@@ -5,40 +5,47 @@
         </a>
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
+            {% if user.is_authenticated %}
           <li class="nav-item">
             <a href="{% url 'profile' %}" class="nav-link link-dark" aria-current="page">
              Профиль
             </a>
           </li>
+            {% endif%}
           <li class="nav-item">
-            <a href=" {% url 'main' year=2024 %} " class="nav-link link-dark">
+            <a href=" {% url 'main' year=current_year %} " class="nav-link link-dark">
               Просмотр план-факта
             </a>
           </li>
             <hr>
           <li class="nav-item">
-            <a href="{% url 'vak' %}" class="nav-link link-dark" aria-current="page">
+            <a href="{% url 'vak_create' %}" class="nav-link link-dark" aria-current="page">
              Добавление ВАК
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'thesis' %}" class="nav-link link-dark" aria-current="page">
+            <a href="{% url 'thesis_create' %}" class="nav-link link-dark" aria-current="page">
              Добавление тезисов
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'monograph' %}" class="nav-link link-dark" aria-current="page">
+            <a href="{% url 'monograph_create' %}" class="nav-link link-dark" aria-current="page">
              Добавление монографий
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'income' %}" class="nav-link link-dark" aria-current="page">
+            <a href="{% url 'income_create' %}" class="nav-link link-dark" aria-current="page">
              Добавление дохода по НИР
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'rid' %}" class="nav-link link-dark" aria-current="page">
+            <a href="{% url 'rid_create' %}" class="nav-link link-dark" aria-current="page">
              Добавление РИД
+            </a>
+          </li>
+           <li class="nav-item">
+            <a href="{% url 'conference' %}" class="nav-link link-dark" aria-current="page">
+             Добавление Конференции
             </a>
           </li>
         </ul>

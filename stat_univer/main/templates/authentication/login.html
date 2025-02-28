@@ -19,6 +19,7 @@
       <div class="col-12">
           <form action="" method="post">
             {% csrf_token %}
+              <div class="form-error">{{ form.non_field_errors }}</div>
               <div class="mb-3">
                 <label for="username" class="form-label">Имя пользователя</label>
                 <input type="text" class="form-control" name="username" aria-describedby="usernameHelp">
@@ -28,6 +29,7 @@
                 <input type="password" class="form-control" name="password">
               </div>
               <button type="submit" class="btn btn-primary">Войти</button>
+              <input type="hidden" name="next" value="{{ next }}">
           </form>
       </div>
 </div>

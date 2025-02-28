@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 # Adding setting
 # https://qna.habr.com/q/701205
 import environ
+
 env = environ.Env(
     DEBUG=(bool, False)
 )
@@ -12,38 +13,32 @@ STAFF_MAIL_TO = env('STAFF_MAIL_TO')
 ERROR_LOG_FILENAME = 'log_error.log'
 
 
-class DepartureTemplate:
-    def __init__(self, id, name, values):
-        self.id = id
-        self.name = name
-        self.values = values
-
-
 # Отправка email-уведомления
-def send_mail_staff(subject, nameRecord, url, department, username, new=True):
+def send_mail_staff(nameRecord, url, department, username, new=True):
     """
-    :param subject: Тема письма
+    Функция отправки сообщения сотрудникам, которые проверяют внесение данных
+    
     :param nameRecord: Название записи (публикации, НИР или РИД)
     :param url: Ссылка на запись
     :param department: Название кафедры
     :param username: Имя пользователя, который довабляет публикацию
     :param new: True - Новая публикация, иначе редактирование уже имеющейся
     """
-    if new:
-        message = f'Пользователь {username} добавил запись для: {department}. \r\n' \
-                  f'Название: {nameRecord}. \r\nСсылка: {url}'
-    else:
-        message = f'{department} внесла изменения в {nameRecord}: {url}'
-        
-    send_mail(
-        subject,
-        message,
-        STAFF_MAIL_FROM,
-        STAFF_MAIL_TO.split(','),
-        fail_silently=False,
-    )
     
+    subject = f'{department} добавила данные.' if new else f'{department} внесла изменения.'
     
+    message = \
+        f'Пользователь {username} добавил запись для: {department}. \r\n' f'Название: {nameRecord}. \r\nСсылка: {url}' \
+            if new else f'{department} внесла изменения в {nameRecord}: {url}'
+    
+    send_mail(subject,
+              message,
+              STAFF_MAIL_FROM,
+              STAFF_MAIL_TO.split(','),
+              fail_silently=False,
+              )
+
+
 STATUS = (
     ('', 'Выберите статус'),
     ('М', 'Международная'),
@@ -322,11 +317,3 @@ PARAMETERNAME = (
     ('ДОХОД', 'Общий доход, руб.'),
     ('РИД', 'РИД'),
 )
-
-
-def dict_from_tuple(_tuple):
-    return dict((key, value) for key, value in _tuple)
-
-
-def binary(value):
-    return 'Да' if value else 'Нет'

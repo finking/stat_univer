@@ -40,6 +40,10 @@ ALLOWED_HOSTS = []
 
 # Переадресация в случае посещения страницы, требующей авторизацию
 LOGIN_URL = 'login'
+# Переадресация после успешной авторизации
+LOGIN_REDIRECT_URL = 'profile'
+# Переадресация после выхода
+LOGOUT_REDIRECT_URL = 'index'
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
@@ -84,6 +88,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
+                'main.context_processors.current_year'
             ],
         },
     },

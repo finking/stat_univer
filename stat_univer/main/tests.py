@@ -1,72 +1,72 @@
-from django.test import TestCase, Client
+from django.contrib.auth.models import User
+from django.test import TestCase, Client, RequestFactory
 from django.urls import reverse, resolve
 from .views import *
-from .models import Conference, Departure
+from .models import Conference, Departure, Employee
 from .forms import ConferenceForm
 from model_bakery import baker
 
 
-# Проверка url адресов.
-class TestUrls(TestCase):
-    
-    def test_url_index(self):
-        url = reverse('index')
-        # print(resolve(url))
-        self.assertEquals(resolve(url).func, index)
-
-    def test_url_vvod(self):
-        url = reverse('vvod')
-        self.assertEquals(resolve(url).func, vvod)
-        
-    def test_url_institute(self):
-        url = reverse('institute')
-        self.assertEquals(resolve(url).func, institute)
-    
-    def test_url_department(self):
-        url = reverse('department')
-        self.assertEquals(resolve(url).func, department)
-    
-    def test_url_lecturer(self):
-        url = reverse('lecturer')
-        self.assertEquals(resolve(url).func, lecturer)
-
-    def test_url_conference(self):
-        url = reverse('conference')
-        self.assertEquals(resolve(url).func, conference)
-
-    def test_url_history(self):
-        url = reverse('history')
-        self.assertEquals(resolve(url).func, history)
-
-    def test_url_faq(self):
-        url = reverse('faq')
-        self.assertEquals(resolve(url).func, faq)
-
-    def test_url_success(self):
-        url = reverse('success')
-        self.assertEquals(resolve(url).func, success)
-        
-    def test_url_export(self):
-        url = reverse('export')
-        self.assertEquals(resolve(url).func, export)
-
-    def test_url_login_user(self):
-        url = reverse('login')
-        self.assertEquals(resolve(url).func, login_user)
-
-    def test_url_logout_user(self):
-        url = reverse('logout')
-        self.assertEquals(resolve(url).func, logout_user)
-
-    def test_url_profile(self):
-        url = reverse('profile')
-        self.assertEquals(resolve(url).func, profile)
-
-    def test_url_vak(self):
-        url = reverse('vak')
-        self.assertEquals(resolve(url).func, vak)
-
 # ******* Начало проверки Views *********
+class TestLoginUser(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='12345')
+
+    def test_login_user_template(self):
+        # Проверяем, что используется правильный шаблон
+        response = self.client.get(reverse('login'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'authentication/login.html')
+        
+        
+class TestPassChangeView(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='12345')
+        self.client.login(username='testuser', password='12345')
+
+    def test_pass_change_template(self):
+        # Проверяем, что используется правильный шаблон
+        response = self.client.get(reverse('change-password'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'authentication/password_change.html')
+        
+        
+class TestPassChangeDoneView(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='12345')
+        self.client.login(username='testuser', password='12345')
+
+    def test_pass_change_done_template(self):
+        # Проверяем, что используется правильный шаблон
+        response = self.client.get(reverse('password_change_done'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'authentication/password_change_done.html')
+        
+
+class DashboardViewTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.view = DashboardView.as_view()
+
+    def test_get_context_data(self):
+        # Создаем запрос с параметром year=2023
+        request = self.factory.get(reverse('dashboard', kwargs={'year': 2023}))
+        response = self.view(request, year=2023)
+        context = response.context_data
+
+        # Проверяем наличие ключей в контексте
+        self.assertIn('year', context)
+        self.assertEqual(context['year'], 2023)
+        self.assertIn('title', context)
+        self.assertEqual(context['title'], "План-факт по науке за 2023 год")
+        self.assertIn('feature', context)
+        self.assertEqual(context['feature'], 'Количество публикаций в журналах ВАК')
+        self.assertIn('objects', context)
+        
+        
 class TestViewConference(TestCase):
     def setUp(self):
         self.client = Client()
@@ -75,70 +75,42 @@ class TestViewConference(TestCase):
     
     def test_request_GET(self):
         response = self.client.get(self.conference_url)
-        self.assertEquals(response.status_code,  200)
+        self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'main/conference.html')
         self.assertContains(response, "Name")
         self.assertContains(response, "Total")
-
+    
     def test_request_POST(self):
         conference_count = Conference.objects.count()
         response = self.client.post(self.conference_url, {
             'Name': 'Тестовая конференция для POST',
             'Country': 'RU',
             'City': 'Волгоград',
-            'Status': 'М', # Кириллица!
+            'Status': 'М',  # Кириллица!
             'Month': 'Mar',
             'Organizer': False,
             'Student': True,
             'Total': 100,
             'Delegate': 10
         })
-
+        
         self.assertEquals(response.status_code, 302)
-        self.assertEqual(Conference.objects.count(), conference_count+1)
-        self.assertRedirects(response, "/success")
+        self.assertEqual(Conference.objects.count(), conference_count + 1)
+        self.assertRedirects(response, "/conference")
 
 
 class TestViewIndex(TestCase):
     def test_request_GET(self):
         response = self.client.get(reverse('index'))
-        self.assertEquals(response.status_code,  200)
+        self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'main/index.html')
 
 
-class TestViewVvod(TestCase):
-    def test_request_GET(self):
-        response = self.client.get(reverse('vvod'))
-        self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'main/vvod.html')
-        
-        
-class TestViewSuccess(TestCase):
-    def test_request_GET(self):
-        response = self.client.get(reverse('success'))
-        self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'main/success.html')
-        
-        
 class TestViewInstitute(TestCase):
     def test_request_GET(self):
         response = self.client.get(reverse('institute'))
-        self.assertEquals(response.status_code,  200)
+        self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'main/institute.html')
-        
-
-class TestViewDepartment(TestCase):
-    def test_request_GET(self):
-        response = self.client.get(reverse('department'))
-        self.assertEquals(response.status_code,  200)
-        self.assertTemplateUsed(response, 'main/department.html')
-        
-        
-class TestViewLecture(TestCase):
-    def test_request_GET(self):
-        response = self.client.get(reverse('lecturer'))
-        self.assertEquals(response.status_code,  200)
-        self.assertTemplateUsed(response, 'main/lecturer.html')
 
 
 class TestViewHistory(TestCase):
@@ -150,36 +122,18 @@ class TestViewHistory(TestCase):
     
     def test_request_GET(self):
         response = self.client.get(reverse('history'))
-        self.assertEquals(response.status_code,  200)
+        self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'main/history.html')
         self.assertContains(response, "email")
 
-    # def test_request_POST(self): # TODO разобраться как проверять подобный post запрос. Когда данные не вносятся в бд, а выбираются!
-    #     response = self.client.post(reverse('history'), {'Email': 'test@ya.ru'})
-    #     conferences_history = Conference.objects.filter(Email=self.email)
-    #
-    #     self.assertEquals(response.status_code, 200)
-    #     self.assertEqual(len(conferences_history), 1)
-    #     # self.assertRedirects(response, "/success") # TODO Нужен ли редирект в history?
-    
 
 class TestViewFAQ(TestCase):
     def test_request_GET(self):
         response = self.client.get(reverse('faq'))
-        self.assertEquals(response.status_code,  200)
+        self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'main/faq.html')
-        
-
-class TestViewExport(TestCase):
-    def test_request_GET(self):
-        response = self.client.get(reverse('export'))
-        # print(response.headers['Content-Disposition'])
-        self.assertEquals(response.headers['Content-Type'],
-                          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-        self.assertEquals(response.headers['Content-Disposition'],
-                          f"attachment; "f"filename={datetime.now().strftime('%d-%m-%Y')}-conferences.xlsx")
-        self.assertEquals(response.status_code,  200)
 # ******* Окончание проверки Views *********
+
 
 # ******* Начало проверки Forms *********
 class TestFormsConference(TestCase):
@@ -194,10 +148,10 @@ class TestFormsConference(TestCase):
             'Student': True,
             'Total': 100,
             'Delegate': 10
-
+            
         })
         self.assertTrue(form.is_valid())
-        
+    
     def test_conference_form_no_data(self):
         form = ConferenceForm(data={})
         
@@ -220,7 +174,8 @@ class TestFormsHistory(TestCase):
         form = HistoryForm(data={})
         self.assertFalse(form.is_valid())
         self.assertEquals(len(form.errors), 1)
-        
+
+
 # TODO Протестировать Forms, которые только в Admin: Institute и FAQ
 
 # ******* Окончание проверки Forms *********
@@ -241,10 +196,10 @@ class TestModelsIntitute(TestCase):
         self.institute = Institute.objects.create(
             Name='Институт благородных дел',  # TODO Исправить в models.py описание ошибки
             ShortName='ИБД',
-            IdDirector=self.director,
-            IdDeputeScience=self.depute
+            Director=self.director,
+            DeputeScience=self.depute
         )
-
+    
     def test_model_str(self):
         self.assertEqual(str(self.institute), "Институт благородных дел")
 
@@ -271,5 +226,7 @@ class TestModelsFaq(TestCase):
     
     def test_model_str(self):
         self.assertEqual(str(self.faq), "Вопрос первый.")
-        
+
+
 # ******* Окончание проверки Models *********
+

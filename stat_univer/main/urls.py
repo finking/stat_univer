@@ -1,36 +1,66 @@
+from django.contrib.auth.views import LogoutView
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    # Авторизация
+    path('login_user', views.LoginUser.as_view(), name='login'),
+    path('logout_user', LogoutView.as_view(), name='logout'),
+    path('change-password/', views.PassChangeView.as_view(), name='change-password'),
+    path('change-password/done/', views.PassChangeDoneView.as_view(), name='password_change_done'),
+    
+    # Визуализация
+    path('dashboard/<int:year>', views.DashboardView.as_view(), name='dashboard'),
+    
+    # Отображение общей информации
+    path('', views.Index.as_view(), name='index'),
+    path('profile', views.ProfileView.as_view(), name='profile'),
+    path('institute', views.InstituteList.as_view(), name='institute'),
+    path('faq', views.FaqView.as_view(), name='faq'),
+    
+    # Форма внесения конференции и история внесения
+    path('conference', views.ConferenceView.as_view(), name='conference'),
+    path('history', views.HistoryView.as_view(), name='history'),
+
+    # Новые данные по публикациям, доходу и РИД
+    path('vak', views.VakCreateView.as_view(), name='vak_create'),
+    path('thesis', views.ThesisCreateView.as_view(), name='thesis_create'),
+    path('monograph', views.MonographCreateView.as_view(), name='monograph_create'),
+    path('income', views.IncomeCreateView.as_view(), name='income_create'),
+    path('rid', views.RidCreateView.as_view(), name='rid_create'),
+    
+    # Изменение данных по публикациям, доходу и РИД
+    path('vak/update/<int:pk>', views.VakEditView.as_view(), name='vak_update'),
+    path('thesis/update/<int:pk>', views.ThesisEditView.as_view(), name='thesis_update'),
+    path('monograph/update/<int:pk>', views.MonographEditView.as_view(), name='monograph_update'),
+    path('income/update/<int:pk>', views.IncomeEditView.as_view(), name='income_update'),
+    path('rid/update/<int:pk>', views.RidEditView.as_view(), name='rid_update'),
+
+    # Отчеты по вузу и институтам для отображения на сайте
+    path('institutes/year/<int:year>/', views.InstituteReportListView.as_view(), name='main'),
+    path('report/<int:institute_id>/<int:year>', views.DepartmentReportListView.as_view(), name='report'),
+    
+    # Списки по публикациям всего университета
     path('vakList', views.VakListView.as_view(), name='vakList'),
     path('thesisList', views.ThesisListView.as_view(), name='thesisList'),
     path('monographList', views.MonographListView.as_view(), name='monographList'),
-    path('bd/', views.vvod, name="vvod"),
-    path('institute', views.institute, name='institute'),
-    path('department', views.department, name='department'),
-    path('lecturer', views.lecturer, name='lecturer'),
-    path('conference', views.conference, name='conference'),
-    path('history', views.history, name='history'),
-    path('faq', views.faq, name='faq'),
-    path('success', views.success, name='success'),
-    path('export', views.export, name='export'),
-    path('export_pf_all/<int:year>', views.export_pf_all, name='export_pf_all'),
-    path('export_pf/<int:institute_id>/<int:year>', views.export_pf, name='export_pf'),
-    path('export_publications/<str:model>', views.export_publications_csv, name='export_publications'),
-    path('login_user', views.login_user, name='login'),
-    path('logout_user', views.logout_user, name='logout'),
-    path('change-password/', views.PassChangeView.as_view(), name='change-password'),
-    path('change-password/done/', views.PassChangeDoneView.as_view(), name='password_change_done'),
-    path('profile', views.profile, name='profile'),
-    path('vak', views.vak, name='vak'),
-    path('edit/<int:feature_id>/<str:feature>', views.edit, name='edit'),
-    path('main/<int:year>', views.main, name='main'),
-    path('thesis', views.thesis, name='thesis'),
-    path('monograph', views.monograph, name='monograph'),
-    path('income', views.income, name='income'),
-    path('rid', views.rid, name='rid'),
-    path('report/<int:institute_id>/<int:year>', views.report, name='report'),
-    path('catalogue/<int:department_id>/<str:feature>/<int:year>', views.catalogue, name='catalogue'),
-    path('dashboard/', views.dashboard, name='dashboard')
+    
+    # Списки по публикациям, доходу и РИД для каждой кафедры
+    path('vakListDeparture/<int:department_id>/<int:year>', views.VakListDepartureView.as_view(),
+         name='vak_list_departure'),
+    path('thesisListDeparture/<int:department_id>/<int:year>', views.ThesisListDepartureView.as_view(),
+         name='thesis_list_departure'),
+    path('monographListDeparture/<int:department_id>/<int:year>', views.MonographListDepartureView.as_view(),
+         name='monograph_list_departure'),
+    path('incomeListDeparture/<int:department_id>/<int:year>', views.IncomeListDepartureView.as_view(),
+         name='income_list_departure'),
+    path('ridListDeparture/<int:department_id>/<int:year>', views.RidListDepartureView.as_view(),
+         name='rid_list_departure'),
+    
+    # Экспорт данных
+    path('export_conference', views.DownloadConferenceExcelView.as_view(), name='export'),
+    path('export_publications/<str:model>', views.DownloadPublicationExcelView.as_view(), name='export_publications'),
+    path('export_pf_all/<int:year>', views.DownloadPlanFactAllExcelView.as_view(), name='export_pf_all'),
+    path('export_pf/<int:institute_id>/<int:year>', views.DownloadPlanFactInstituteExcelView.as_view(),
+         name='export_pf'),
 ]
