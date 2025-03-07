@@ -1,8 +1,12 @@
 from django.contrib import admin
 from django.db.models import Count, Q
 from django.db.models.functions import Lower
+from import_export.admin import ImportExportModelAdmin
+from import_export import resources, fields
+from import_export.widgets import ForeignKeyWidget
 
 from .models import Institute, Departure, Employee, Conference, FAQ, VAK, Thesis, Monograph, Plan, Income, RID
+from .utils import PARAMETERNAME
 
 
 class DuplicatesFilter(admin.SimpleListFilter):
@@ -92,9 +96,35 @@ admin.site.register(FAQ)
 admin.site.register(VAK, VAKAdmin)
 admin.site.register(Thesis, ThesisAdmin)
 admin.site.register(Monograph, MonographAdmin)
-admin.site.register(Plan, PlanAdmin)
+# admin.site.register(Plan, PlanAdmin)
 admin.site.register(Income, IncomeAdmin)
 admin.site.register(RID, RIDAdmin)
 
 admin.site.site_title = 'Админ-панель сайта отдела статистики ГУУ'
 admin.site.site_header = 'Админ-панель сайта отдела статистики ГУУ'
+
+
+# Добавление экспорта-импорта из админ-панели с помощью библиотеки django-import-export
+class PlanResource(resources.ModelResource):
+    Departure = fields.Field(
+        column_name='Departure',
+        attribute='Departure',
+        widget=ForeignKeyWidget(Departure, 'Name')
+    )
+    
+    class Meta:
+        model = Plan
+        fields = ('Departure', 'Name', 'Year', 'Value')
+        import_id_fields = ('Departure', 'Name', 'Year')
+        skip_unchanged = True  # Пропускать неизмененные строки
+    
+    def before_import_row(self, row, **kwargs):
+        # Проверка, что Name есть в PARAMETERNAME
+        if row['Name'] not in [choice[0] for choice in PARAMETERNAME]:
+            raise ValueError(f"Недопустимый параметр: {row['Name']}")
+
+
+@admin.register(Plan)
+class PlanAdmin(ImportExportModelAdmin):
+    resource_classes = [PlanResource]
+

@@ -239,3 +239,6 @@ questions.md
 
 # Dir with media downloaded
 media/
+
+# Dir with static
+static/

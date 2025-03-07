@@ -384,3 +384,6 @@ class Plan(models.Model):
     Value = models.FloatField('Значение (в шт) или Сумма (в руб.)', default=0)
     DateCreated = models.DateTimeField(auto_now_add=True, verbose_name='Дата внесения')
     DateUpdated = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f'"{self.Departure}". Показатель {self.Name} за {self.Year}'
