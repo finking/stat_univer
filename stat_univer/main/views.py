@@ -514,7 +514,7 @@ class MonographListView(PublicationMixin, ListView):
 class ListDepartureMixin:
     template_name = 'authentication/department_parametr_list.html'
     # context_object_name = 'departures'
-    ordering = '-DateCreated'
+    ordering = ['-Year', '-DateCreated']
     paginate_by = 10
     
     def get_queryset(self):
