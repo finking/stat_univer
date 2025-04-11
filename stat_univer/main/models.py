@@ -254,7 +254,7 @@ class BaseModel(models.Model):
     Points = models.FloatField('Количество баллов: ',
                                default=0,
                                blank=True)
-    Comment = models.TextField('Комментарий отдела статистики: ',
+    Comment = models.TextField('Комментарий проверяющего: ',
                                blank=True,
                                null=True)
     Departure = models.ForeignKey(

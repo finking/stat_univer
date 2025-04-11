@@ -100,8 +100,8 @@ admin.site.register(Monograph, MonographAdmin)
 admin.site.register(Income, IncomeAdmin)
 admin.site.register(RID, RIDAdmin)
 
-admin.site.site_title = 'Админ-панель сайта отдела статистики ГУУ'
-admin.site.site_header = 'Админ-панель сайта отдела статистики ГУУ'
+admin.site.site_title = 'Админ-панель сайта отдела НТИ ГУУ'
+admin.site.site_header = 'Админ-панель сайта отдела НТИ ГУУ'
 
 
 # Добавление экспорта-импорта из админ-панели с помощью библиотеки django-import-export
