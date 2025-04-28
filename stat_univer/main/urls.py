@@ -1,6 +1,12 @@
 from django.contrib.auth.views import LogoutView
+from django.contrib.sitemaps.views import sitemap
 from django.urls import path
 from . import views
+from .sitemaps import StaticViewSitemap
+
+sitemaps = {
+    "static": StaticViewSitemap,
+}
 
 urlpatterns = [
     # Авторизация
@@ -63,4 +69,12 @@ urlpatterns = [
     path('export_pf_all/<int:year>', views.DownloadPlanFactAllExcelView.as_view(), name='export_pf_all'),
     path('export_pf/<int:institute_id>/<int:year>', views.DownloadPlanFactInstituteExcelView.as_view(),
          name='export_pf'),
+    
+    # Карта сайта
+    path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
 ]
