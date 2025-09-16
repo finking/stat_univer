@@ -308,6 +308,11 @@ class VAK(Publication):
     def __str__(self):
         return self.Name
     
+    Doi = models.CharField('DOI',
+                           max_length=250,
+                           blank=True,
+                           null=True)
+    
     Tom = models.CharField('Том',
                            max_length=250,
                            blank=True,

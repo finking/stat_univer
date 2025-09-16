@@ -245,10 +245,16 @@ class VAKForm(PublicationForm):
 
     class Meta(PublicationForm.Meta):
         model = VAK
-        fields = PublicationForm.Meta.fields[:3] + ['Tom'] + PublicationForm.Meta.fields[3:]
+        fields = PublicationForm.Meta.fields[:3] + ['Doi'] + ['Tom'] + PublicationForm.Meta.fields[3:]
 
         widgets = {
             **PublicationForm.Meta.widgets,
+            'Doi': TextInput(attrs={
+                'class': 'form-control',
+                'id': 'Doi',
+                'placeholder': 'Введите DOI публикации',
+                'required': False,
+            }),
             'Tom': TextInput(attrs={
                 'class': 'form-control',
                 'id': 'Tom',
