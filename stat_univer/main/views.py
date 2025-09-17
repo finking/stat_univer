@@ -289,6 +289,18 @@ class GeneralEditView(UpdateView, LoginRequiredMixin):
                 form.cleaned_data["Departure"],
                 self.request.user.last_name,
                 new=False)
+
+            # Сохранение значений защищенных полей при редактировании записи обычными пользователям
+            instance = form.save(commit=False)
+            
+            original = self.get_object()
+            protected_fields = ['Comment', 'Accepted', 'Points']
+
+            for field in protected_fields:
+                if hasattr(original, field):
+                    setattr(instance, field, getattr(original, field))
+
+            instance.save()
         
         return super().form_valid(form)
 
