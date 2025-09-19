@@ -49,6 +49,12 @@ class InstituteAdmin(admin.ModelAdmin):
     search_fields = ('Name',)
 
 
+class ConferenceAdmin(admin.ModelAdmin):
+    list_display = ('Name', 'Country', 'City', 'Organizer', 'TimeCreate')
+    search_fields = ('Name', 'Country', 'City', 'TimeCreate')
+    list_filter = ('TimeCreate', 'Organizer', 'City')
+
+
 class VAKAdmin(admin.ModelAdmin):
     list_display = ('Name', 'Departure', 'Author', 'DateCreated', 'Accepted')
     list_display_links = ('Name', )
@@ -91,7 +97,7 @@ class RIDAdmin(admin.ModelAdmin):
 admin.site.register(Institute, InstituteAdmin)
 admin.site.register(Departure)
 admin.site.register(Employee)
-admin.site.register(Conference)
+admin.site.register(Conference, ConferenceAdmin)
 admin.site.register(FAQ)
 admin.site.register(VAK, VAKAdmin)
 admin.site.register(Thesis, ThesisAdmin)
