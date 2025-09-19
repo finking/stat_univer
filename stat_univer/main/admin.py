@@ -51,7 +51,7 @@ class InstituteAdmin(admin.ModelAdmin):
 
 class ConferenceAdmin(admin.ModelAdmin):
     list_display = ('Name', 'Country', 'City', 'Organizer', 'TimeCreate')
-    search_fields = ('Name', 'Country', 'City', 'TimeCreate')
+    search_fields = ('Name', 'Country', 'City')
     list_filter = ('TimeCreate', 'Organizer', 'City')
 
 
