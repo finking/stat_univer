@@ -14,7 +14,8 @@ import logging
 from datetime import datetime
 from xlsxwriter.workbook import Workbook
 
-from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm, MonographForm, IncomeForm, RidForm, DashboardForm
+from .forms import ConferenceForm, HistoryForm, VAKForm, ThesisForm, MonographForm, IncomeForm, RidForm, \
+    DashboardForm, ConferenceExportForm
 from .models import Institute, Conference, FAQ, VAK, Thesis, Departure, Monograph, Income, RID, Plan
 from .utils import PARAMETERNAME, send_mail_staff
 
@@ -750,16 +751,35 @@ class ExcelWriterPlanFact(DepartmentReportMixin, ExcelWriterBase):
                         row.extend(list(values.values())[:-1])
                     self.lst.append(row)
  
-        
+ 
 # Класс для экспорта Конференций
-class DownloadConferenceExcelView(View):
-    def get(self, request, *args, **kwargs):
-        # Получаем все записи из модели Conference
-        conferences_queryset = Conference.objects.all()
-        
-        # Если записей нет, возвращаем сообщение
-        if not conferences_queryset.exists():
-            return HttpResponse("Нет данных для экспорта.")
+class DownloadConferenceExcelView(FormView):
+    template_name = 'authentication/conference_export.html'
+    form_class = ConferenceExportForm
+
+    def form_valid(self, form):
+        # Фильтруем данные по форме
+        queryset = self.get_filtered_queryset(form.cleaned_data)
+
+        # Экспортируем в Excel
+        return self.export_conference_to_excel(self.request, queryset)
+
+    def get_filtered_queryset(self, form_data):
+        """Фильтруем QuerySet на основе данных формы"""
+        queryset = Conference.objects.all()
+    
+        start_date = form_data.get('start_date')
+        end_date = form_data.get('end_date')
+    
+        if start_date:
+            queryset = queryset.filter(TimeCreate__date__gte=start_date)
+    
+        if end_date:
+            queryset = queryset.filter(TimeCreate__date__lte=end_date)
+    
+        return queryset
+    
+    def export_conference_to_excel(self, request, conferences_queryset):
         
         # Названия столбцов
         header_columns = [

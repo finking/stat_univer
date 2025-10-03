@@ -1,6 +1,6 @@
 from .models import Conference, Institute, FAQ, VAK, Thesis, Monograph, Income, RID
 from django.forms import ModelForm, TextInput, Select, URLInput, EmailInput, Textarea, NumberInput, \
-    CheckboxInput, Form, EmailField, FileInput, ChoiceField
+    CheckboxInput, Form, EmailField, FileInput, ChoiceField, DateField, DateInput
 from .utils import PARAMETERNAME
 
 
@@ -98,6 +98,19 @@ class DashboardForm(Form):
     feature = ChoiceField(choices=PARAMETERNAME,
                           label='Показатель',
                           widget=Select(attrs={"style": "width: 100%"}))
+
+
+class ConferenceExportForm(Form):
+    start_date = DateField(
+        label='Дата с',
+        widget=DateInput(attrs={'type': 'date'}),
+        required=False
+    )
+    end_date = DateField(
+        label='Дата по',
+        widget=DateInput(attrs={'type': 'date'}),
+        required=False
+    )
 
 
 class InstituteForm(ModelForm):

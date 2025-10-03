@@ -64,7 +64,7 @@ urlpatterns = [
          name='rid_list_departure'),
     
     # Экспорт данных
-    path('export_conference', views.DownloadConferenceExcelView.as_view(), name='export'),
+    path('export_conference', views.DownloadConferenceExcelView.as_view(), name='export_conference'),
     path('export_publications/<str:model>', views.DownloadPublicationExcelView.as_view(), name='export_publications'),
     path('export_pf_all/<int:year>', views.DownloadPlanFactAllExcelView.as_view(), name='export_pf_all'),
     path('export_pf/<int:institute_id>/<int:year>', views.DownloadPlanFactInstituteExcelView.as_view(),
