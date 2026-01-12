@@ -310,30 +310,55 @@ class VakEditView(PermissionRequiredMixin, GeneralEditView):
     model = VAK
     form_class = VAKForm
     permission_required = 'main.change_vak'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title_name'] = 'о публикации ВАК'
+        return context
 
 
 class ThesisEditView(PermissionRequiredMixin, GeneralEditView):
     model = Thesis
     form_class = ThesisForm
     permission_required = 'main.change_thesis'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title_name'] = 'о публикации тезисов'
+        return context
 
 
 class MonographEditView(PermissionRequiredMixin, GeneralEditView):
     model = Monograph
     form_class = MonographForm
     permission_required = 'main.change_monograph'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title_name'] = 'о монографии'
+        return context
 
 
 class IncomeEditView(PermissionRequiredMixin, GeneralEditView):
     model = Income
     form_class = IncomeForm
     permission_required = 'main.change_income'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title_name'] = 'о НИР'
+        return context
 
 
 class RidEditView(PermissionRequiredMixin, GeneralEditView):
     model = RID
     form_class = RidForm
     permission_required = 'main.change_rid'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title_name'] = 'о РИД'
+        return context
 
 
 # Класс отображения план-факта Университета (всех Институтов)
